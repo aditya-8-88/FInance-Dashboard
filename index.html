@@ -1,5 +1,5 @@
 <!DOCTYPE html >
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,19 +8,79 @@
           integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3oD+sCoJrzXJ+yKen9RtQ1KL9Ut2dsevX/xMRPyhed4AzXFAAFBPQ=="
           crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
+    /* ── CSS Variables ────────────────────────────────────────────────────── */
+    :root {
+      --bg:              #f5f6fa;
+      --surface:         #ffffff;
+      --surface-raised:  #f9fafb;
+      --surface-hover:   #fafafa;
+      --border:          #e5e7eb;
+      --border-strong:   #f3f4f6;
+      --text-primary:    #111827;
+      --text-secondary:  #374151;
+      --text-muted:      #6b7280;
+      --text-faint:      #9ca3af;
+      --input-bg:        #ffffff;
+      --input-border:    #d1d5db;
+      --tab-bg:          #f3f4f6;
+      --tab-active-bg:   #ffffff;
+      --overlay-bg:      rgba(15, 23, 42, 0.45);
+      --scroll-track:    #f3f4f6;
+      --scroll-thumb:    #d1d5db;
+      --ghost-bg:        #f3f4f6;
+      --ghost-color:     #374151;
+      --ghost-border:    #e5e7eb;
+      --danger-bg:       #fee2e2;
+      --danger-color:    #dc2626;
+      --danger-hover:    #fecaca;
+      --chart-grid:      #f3f4f6;
+      --chart-tick:      #6b7280;
+      --chart-legend:    #374151;
+    }
+
+    [data-theme="dark"] {
+      --bg:              #0d1117;
+      --surface:         #161b22;
+      --surface-raised:  #21262d;
+      --surface-hover:   #1c2128;
+      --border:          #30363d;
+      --border-strong:   #21262d;
+      --text-primary:    #e6edf3;
+      --text-secondary:  #cdd9e5;
+      --text-muted:      #8b949e;
+      --text-faint:      #6e7681;
+      --input-bg:        #0d1117;
+      --input-border:    #30363d;
+      --tab-bg:          #21262d;
+      --tab-active-bg:   #2d333b;
+      --overlay-bg:      rgba(1, 4, 9, 0.75);
+      --scroll-track:    #161b22;
+      --scroll-thumb:    #30363d;
+      --ghost-bg:        #21262d;
+      --ghost-color:     #cdd9e5;
+      --ghost-border:    #30363d;
+      --danger-bg:       rgba(220, 38, 38, 0.18);
+      --danger-color:    #f87171;
+      --danger-hover:    rgba(220, 38, 38, 0.28);
+      --chart-grid:      #21262d;
+      --chart-tick:      #8b949e;
+      --chart-legend:    #8b949e;
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: #f5f6fa;
-      color: #1a1a2e;
+      background: var(--bg);
+      color: var(--text-primary);
       min-height: 100vh;
+      transition: background 0.22s, color 0.22s;
     }
 
     /* ── Header ─────────────────────────────────────────────────────────── */
     header {
-      background: #fff;
-      border-bottom: 1px solid #e5e7eb;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
       padding: 1rem 1.5rem;
       display: flex;
       justify-content: space-between;
@@ -30,10 +90,22 @@
       position: sticky;
       top: 0;
       z-index: 50;
+      transition: background 0.22s, border-color 0.22s;
     }
-    .header-title h1 { font-size: 1.2rem; font-weight: 700; color: #111827; }
-    .header-title p  { font-size: 0.78rem; color: #9ca3af; margin-top: 2px; }
-    .header-actions  { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+    .header-title h1 { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); }
+    .header-title p  { font-size: 0.78rem; color: var(--text-faint); margin-top: 2px; }
+    .header-actions  { display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center; }
+
+    /* ── Theme Toggle ────────────────────────────────────────────────────── */
+    .theme-toggle {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--ghost-bg);
+      cursor: pointer; font-size: 1rem;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { background: var(--tab-bg); }
 
     /* ── Buttons ─────────────────────────────────────────────────────────── */
     .btn {
@@ -45,10 +117,10 @@
     }
     .btn-primary  { background: #2563eb; color: #fff; }
     .btn-primary:hover  { background: #1d4ed8; }
-    .btn-ghost    { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
-    .btn-ghost:hover    { background: #e5e7eb; }
-    .btn-danger   { background: #fee2e2; color: #dc2626; padding: 0.28rem 0.55rem; border-radius: 5px; font-size: 0.78rem; }
-    .btn-danger:hover   { background: #fecaca; }
+    .btn-ghost    { background: var(--ghost-bg); color: var(--ghost-color); border: 1px solid var(--ghost-border); }
+    .btn-ghost:hover    { background: var(--tab-bg); }
+    .btn-danger   { background: var(--danger-bg); color: var(--danger-color); padding: 0.28rem 0.55rem; border-radius: 5px; font-size: 0.78rem; }
+    .btn-danger:hover   { background: var(--danger-hover); }
 
     /* ── Layout ──────────────────────────────────────────────────────────── */
     main { max-width: 1220px; margin: 0 auto; padding: 1.5rem; }
@@ -61,14 +133,15 @@
       margin-bottom: 1.5rem;
     }
     .metric-card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1rem 1.2rem;
+      transition: background 0.22s, border-color 0.22s;
     }
     .metric-card .mc-label {
       display: flex; align-items: center; gap: 6px;
-      font-size: 0.72rem; font-weight: 600; color: #6b7280;
+      font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
       text-transform: uppercase; letter-spacing: 0.05em;
       margin-bottom: 0.45rem;
     }
@@ -76,10 +149,10 @@
       width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
     }
     .metric-card .mc-value {
-      font-size: 1.35rem; font-weight: 700; color: #111827; line-height: 1.1;
+      font-size: 1.35rem; font-weight: 700; color: var(--text-primary); line-height: 1.1;
     }
     .metric-card .mc-sub {
-      font-size: 0.75rem; color: #9ca3af; margin-top: 0.3rem;
+      font-size: 0.75rem; color: var(--text-faint); margin-top: 0.3rem;
     }
     .metric-card.mc-total .mc-value { font-size: 1.55rem; }
 
@@ -93,69 +166,71 @@
     @media (max-width: 760px) { .charts-row { grid-template-columns: 1fr; } }
 
     .chart-card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1.2rem 1.3rem;
+      transition: background 0.22s, border-color 0.22s;
     }
     .chart-card h2 {
-      font-size: 0.88rem; font-weight: 600; color: #374151; margin-bottom: 1rem;
+      font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem;
     }
     .chart-canvas-wrap { position: relative; height: 285px; }
 
     /* ── Table Card ──────────────────────────────────────────────────────── */
     .table-card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 1.2rem 1.3rem;
       margin-bottom: 1.5rem;
+      transition: background 0.22s, border-color 0.22s;
     }
     .table-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;
     }
-    .table-header h2 { font-size: 0.88rem; font-weight: 600; color: #374151; }
+    .table-header h2 { font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); }
 
     .filter-tabs {
-      display: flex; background: #f3f4f6; border-radius: 7px; padding: 3px;
+      display: flex; background: var(--tab-bg); border-radius: 7px; padding: 3px;
     }
     .filter-tab {
       padding: 0.3rem 0.8rem; border-radius: 5px; border: none;
-      background: transparent; font-size: 0.8rem; cursor: pointer; color: #6b7280;
+      background: transparent; font-size: 0.8rem; cursor: pointer; color: var(--text-muted);
       font-weight: 500; transition: all 0.15s;
     }
     .filter-tab.active {
-      background: #fff; color: #111827;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: var(--tab-active-bg); color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
     }
 
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
     th {
       text-align: left; padding: 0.55rem 0.8rem;
-      border-bottom: 2px solid #f3f4f6;
-      font-size: 0.7rem; font-weight: 600; color: #9ca3af;
+      border-bottom: 2px solid var(--border-strong);
+      font-size: 0.7rem; font-weight: 600; color: var(--text-faint);
       text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
     }
     td {
-      padding: 0.65rem 0.8rem; border-bottom: 1px solid #f9fafb;
-      color: #374151; white-space: nowrap;
+      padding: 0.65rem 0.8rem; border-bottom: 1px solid var(--border-strong);
+      color: var(--text-secondary); white-space: nowrap;
     }
     tr:last-child td { border-bottom: none; }
-    tbody tr:hover td { background: #fafafa; }
+    tbody tr:hover td { background: var(--surface-hover); }
     .empty-row td {
       text-align: center; padding: 3rem 1rem;
-      color: #9ca3af; font-size: 0.88rem;
+      color: var(--text-faint); font-size: 0.88rem;
     }
     .td-amount { font-variant-numeric: tabular-nums; }
-    .td-total  { font-weight: 600; color: #111827; }
-    .td-label  { color: #6b7280; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+    .td-total  { font-weight: 600; color: var(--text-primary); }
+    .td-label  { color: var(--text-muted); max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
 
     /* ── Modal ───────────────────────────────────────────────────────────── */
     .overlay {
       position: fixed; inset: 0;
-      background: rgba(15, 23, 42, 0.45);
+      background: var(--overlay-bg);
       display: flex; align-items: center; justify-content: center;
       z-index: 200; padding: 1rem;
       opacity: 0; pointer-events: none; transition: opacity 0.18s;
@@ -163,17 +238,18 @@
     .overlay.open { opacity: 1; pointer-events: auto; }
 
     .modal {
-      background: #fff; border-radius: 14px;
+      background: var(--surface); border-radius: 14px;
+      border: 1px solid var(--border);
       padding: 1.75rem 1.75rem 1.5rem;
       width: 100%; max-width: 520px;
       max-height: 92vh; overflow-y: auto;
-      transform: translateY(12px); transition: transform 0.18s;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      transform: translateY(12px); transition: transform 0.18s, background 0.22s;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.32);
     }
     .overlay.open .modal { transform: translateY(0); }
 
     .modal-heading {
-      font-size: 1.05rem; font-weight: 700; color: #111827;
+      font-size: 1.05rem; font-weight: 700; color: var(--text-primary);
       margin-bottom: 1.4rem;
     }
 
@@ -185,10 +261,10 @@
 
     .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
     .form-group label {
-      font-size: 0.76rem; font-weight: 600; color: #374151;
+      font-size: 0.76rem; font-weight: 600; color: var(--text-secondary);
       display: flex; align-items: center; gap: 5px;
     }
-    .form-group label .tgt { color: #9ca3af; font-weight: 400; }
+    .form-group label .tgt { color: var(--text-faint); font-weight: 400; }
     .form-group label .fdot {
       width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
     }
@@ -197,45 +273,49 @@
     input[type="number"],
     input[type="date"] {
       padding: 0.5rem 0.7rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--input-border);
       border-radius: 7px;
       font-size: 0.875rem;
-      color: #111827;
-      background: #fff;
+      color: var(--text-primary);
+      background: var(--input-bg);
       width: 100%;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.22s, color 0.22s;
     }
     input:focus {
       outline: none;
       border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.18);
     }
     input.readonly-computed {
-      background: #f9fafb; color: #6b7280; cursor: default;
+      background: var(--surface-raised); color: var(--text-muted); cursor: default;
     }
-    input.readonly-computed:focus { border-color: #d1d5db; box-shadow: none; }
+    input.readonly-computed:focus { border-color: var(--input-border); box-shadow: none; }
+
+    [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.7);
+    }
 
     .form-divider {
       grid-column: 1 / -1;
-      border: none; border-top: 1px solid #f3f4f6;
+      border: none; border-top: 1px solid var(--border-strong);
       margin: 0.1rem 0;
     }
     .form-section-label {
       grid-column: 1 / -1;
-      font-size: 0.7rem; font-weight: 700; color: #9ca3af;
+      font-size: 0.7rem; font-weight: 700; color: var(--text-faint);
       text-transform: uppercase; letter-spacing: 0.06em;
     }
 
     .modal-actions {
       display: flex; gap: 0.75rem; justify-content: flex-end;
       margin-top: 1.4rem; padding-top: 1.1rem;
-      border-top: 1px solid #f3f4f6;
+      border-top: 1px solid var(--border-strong);
     }
 
     /* ── Scrollbar ───────────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    ::-webkit-scrollbar-track { background: var(--scroll-track); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 10px; }
   </style>
 </head>
 <body>
@@ -247,6 +327,7 @@
     <p>Zerodha Kite + Coin &nbsp;·&nbsp; Data stored locally in your browser</p>
   </div>
   <div class="header-actions">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">&#x1F319;</button>
     <button class="btn btn-ghost" onclick="exportCSV()">&#x2B07;&#xFE0F; Export CSV</button>
     <button class="btn btn-primary" onclick="openModal()">+ Log Investment</button>
   </div>
@@ -557,6 +638,40 @@ function renderTable() {
     </tr>`).join('');
 }
 
+// ── Theme helpers ──────────────────────────────────────────────────────────
+const THEME_KEY = 'dm_pref';
+
+function isDark() {
+  return document.documentElement.getAttribute('data-theme') === 'dark';
+}
+
+function applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeToggle').textContent = dark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+  localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+}
+
+function toggleTheme() {
+  applyTheme(!isDark());
+  render();
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  applyTheme(saved === 'dark');
+}
+
+// ── Chart color helpers ────────────────────────────────────────────────────
+function chartColors() {
+  const dark = isDark();
+  return {
+    tick:         dark ? '#8b949e' : '#6b7280',
+    grid:         dark ? '#21262d' : '#f3f4f6',
+    legend:       dark ? '#8b949e' : '#374151',
+    donutBorder:  dark ? '#161b22' : '#ffffff',
+  };
+}
+
 // ── Bar Chart ──────────────────────────────────────────────────────────────
 function renderBarChart() {
   const ctx = document.getElementById('barChart');
@@ -591,6 +706,8 @@ function renderBarChart() {
     return;
   }
 
+  const cc = chartColors();
+
   barChart = new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
@@ -600,7 +717,7 @@ function renderBarChart() {
       plugins: {
         legend: {
           position: 'bottom',
-          labels: { boxWidth: 11, padding: 14, font: { size: 11 } },
+          labels: { boxWidth: 11, padding: 14, font: { size: 11 }, color: cc.legend },
         },
         tooltip: {
           callbacks: {
@@ -612,14 +729,14 @@ function renderBarChart() {
         x: {
           stacked: true,
           grid: { display: false },
-          ticks: { font: { size: 11 }, color: '#6b7280' },
+          ticks: { font: { size: 11 }, color: cc.tick },
         },
         y: {
           stacked: true,
-          grid: { color: '#f3f4f6' },
+          grid: { color: cc.grid },
           border: { dash: [4, 4] },
           ticks: {
-            font: { size: 11 }, color: '#6b7280',
+            font: { size: 11 }, color: cc.tick,
             callback: v => v >= 1000 ? '\u20B9' + (v / 1000).toFixed(0) + 'k' : '\u20B9' + v,
           },
         },
@@ -642,6 +759,8 @@ function renderDonutChart() {
     return;
   }
 
+  const cc = chartColors();
+
   donutChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -650,7 +769,7 @@ function renderDonutChart() {
         data:            totals,
         backgroundColor: FUNDS.map(f => f.color),
         borderWidth:     2,
-        borderColor:     '#fff',
+        borderColor:     cc.donutBorder,
         hoverOffset:     6,
       }],
     },
@@ -661,7 +780,7 @@ function renderDonutChart() {
       plugins: {
         legend: {
           position: 'bottom',
-          labels: { boxWidth: 11, padding: 12, font: { size: 11 } },
+          labels: { boxWidth: 11, padding: 12, font: { size: 11 }, color: cc.legend },
         },
         tooltip: {
           callbacks: {
@@ -741,6 +860,7 @@ function render() {
 // ── Init ───────────────────────────────────────────────────────────────────
 buildFundFields();
 loadEntries();
+loadTheme();
 render();
 </script>
 </body>
