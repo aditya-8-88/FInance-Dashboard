@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETF Investment Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
+          integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3oD+sCoJrzXJ+yKen9RtQ1KL9Ut2dsevX/xMRPyhed4AzXFAAFBPQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f6fa;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-title h1 { font-size: 1.2rem; font-weight: 700; color: #111827; }
+    .header-title p  { font-size: 0.78rem; color: #9ca3af; margin-top: 2px; }
+    .header-actions  { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.48rem 1rem; border-radius: 7px; border: none;
+      cursor: pointer; font-size: 0.84rem; font-weight: 500;
+      transition: background 0.15s, box-shadow 0.15s;
+      line-height: 1;
+    }
+    .btn-primary  { background: #2563eb; color: #fff; }
+    .btn-primary:hover  { background: #1d4ed8; }
+    .btn-ghost    { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+    .btn-ghost:hover    { background: #e5e7eb; }
+    .btn-danger   { background: #fee2e2; color: #dc2626; padding: 0.28rem 0.55rem; border-radius: 5px; font-size: 0.78rem; }
+    .btn-danger:hover   { background: #fecaca; }
+
+    /* ── Layout ──────────────────────────────────────────────────────────── */
+    main { max-width: 1220px; margin: 0 auto; padding: 1.5rem; }
+
+    /* ── Metric Cards ────────────────────────────────────────────────────── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+    .metric-card .mc-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 600; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 0.45rem;
+    }
+    .mc-dot {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+    }
+    .metric-card .mc-value {
+      font-size: 1.35rem; font-weight: 700; color: #111827; line-height: 1.1;
+    }
+    .metric-card .mc-sub {
+      font-size: 0.75rem; color: #9ca3af; margin-top: 0.3rem;
+    }
+    .metric-card.mc-total .mc-value { font-size: 1.55rem; }
+
+    /* ── Charts ──────────────────────────────────────────────────────────── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 760px) { .charts-row { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1.2rem 1.3rem;
+    }
+    .chart-card h2 {
+      font-size: 0.88rem; font-weight: 600; color: #374151; margin-bottom: 1rem;
+    }
+    .chart-canvas-wrap { position: relative; height: 285px; }
+
+    /* ── Table Card ──────────────────────────────────────────────────────── */
+    .table-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1.2rem 1.3rem;
+      margin-bottom: 1.5rem;
+    }
+    .table-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;
+    }
+    .table-header h2 { font-size: 0.88rem; font-weight: 600; color: #374151; }
+
+    .filter-tabs {
+      display: flex; background: #f3f4f6; border-radius: 7px; padding: 3px;
+    }
+    .filter-tab {
+      padding: 0.3rem 0.8rem; border-radius: 5px; border: none;
+      background: transparent; font-size: 0.8rem; cursor: pointer; color: #6b7280;
+      font-weight: 500; transition: all 0.15s;
+    }
+    .filter-tab.active {
+      background: #fff; color: #111827;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th {
+      text-align: left; padding: 0.55rem 0.8rem;
+      border-bottom: 2px solid #f3f4f6;
+      font-size: 0.7rem; font-weight: 600; color: #9ca3af;
+      text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+    }
+    td {
+      padding: 0.65rem 0.8rem; border-bottom: 1px solid #f9fafb;
+      color: #374151; white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #fafafa; }
+    .empty-row td {
+      text-align: center; padding: 3rem 1rem;
+      color: #9ca3af; font-size: 0.88rem;
+    }
+    .td-amount { font-variant-numeric: tabular-nums; }
+    .td-total  { font-weight: 600; color: #111827; }
+    .td-label  { color: #6b7280; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Modal ───────────────────────────────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; padding: 1rem;
+      opacity: 0; pointer-events: none; transition: opacity 0.18s;
+    }
+    .overlay.open { opacity: 1; pointer-events: auto; }
+
+    .modal {
+      background: #fff; border-radius: 14px;
+      padding: 1.75rem 1.75rem 1.5rem;
+      width: 100%; max-width: 520px;
+      max-height: 92vh; overflow-y: auto;
+      transform: translateY(12px); transition: transform 0.18s;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    }
+    .overlay.open .modal { transform: translateY(0); }
+
+    .modal-heading {
+      font-size: 1.05rem; font-weight: 700; color: #111827;
+      margin-bottom: 1.4rem;
+    }
+
+    /* ── Form ────────────────────────────────────────────────────────────── */
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.1rem;
+    }
+    .fg-full { grid-column: 1 / -1; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .form-group label {
+      font-size: 0.76rem; font-weight: 600; color: #374151;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .form-group label .tgt { color: #9ca3af; font-weight: 400; }
+    .form-group label .fdot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+      padding: 0.5rem 0.7rem;
+      border: 1px solid #d1d5db;
+      border-radius: 7px;
+      font-size: 0.875rem;
+      color: #111827;
+      background: #fff;
+      width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    input.readonly-computed {
+      background: #f9fafb; color: #6b7280; cursor: default;
+    }
+    input.readonly-computed:focus { border-color: #d1d5db; box-shadow: none; }
+
+    .form-divider {
+      grid-column: 1 / -1;
+      border: none; border-top: 1px solid #f3f4f6;
+      margin: 0.1rem 0;
+    }
+    .form-section-label {
+      grid-column: 1 / -1;
+      font-size: 0.7rem; font-weight: 700; color: #9ca3af;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    .modal-actions {
+      display: flex; gap: 0.75rem; justify-content: flex-end;
+      margin-top: 1.4rem; padding-top: 1.1rem;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    /* ── Scrollbar ───────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
+<header>
+  <div class="header-title">
+    <h1>&#x1F4C8; ETF Investment Dashboard</h1>
+    <p>Zerodha Kite + Coin &nbsp;·&nbsp; Data stored locally in your browser</p>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="exportCSV()">&#x2B07;&#xFE0F; Export CSV</button>
+    <button class="btn btn-primary" onclick="openModal()">+ Log Investment</button>
+  </div>
+</header>
+
+<!-- ── MAIN ───────────────────────────────────────────────────────────────── -->
+<main>
+  <div class="metrics-grid" id="metricsGrid"></div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <h2>Monthly Investment by Fund</h2>
+      <div class="chart-canvas-wrap"><canvas id="barChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h2>Overall Allocation</h2>
+      <div class="chart-canvas-wrap"><canvas id="donutChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <h2>Investment Log</h2>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-tab" onclick="setFilter('month', this)">This Month</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Label</th>
+            <th>Principal</th>
+            <th>Nifty BeES</th>
+            <th>Junior BeES</th>
+            <th>Nasdaq 100</th>
+            <th>Gold BeES</th>
+            <th>SmallCap 250</th>
+            <th>Kite Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- ── MODAL ──────────────────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-heading">Log Investment</div>
+    <form id="investForm" onsubmit="saveEntry(event)" novalidate>
+      <div class="form-grid">
+
+        <!-- Row 1: Date + Label -->
+        <div class="form-group">
+          <label for="f_date">Date</label>
+          <input type="date" id="f_date" required />
+        </div>
+        <div class="form-group">
+          <label for="f_label">Label <span class="tgt">(optional)</span></label>
+          <input type="text" id="f_label" placeholder="e.g. May SIP" maxlength="80" />
+        </div>
+
+        <!-- Principal -->
+        <div class="form-group fg-full">
+          <label for="f_principal">Principal (&#x20B9;)</label>
+          <input type="number" id="f_principal" min="0" step="0.01"
+                 placeholder="e.g. 10000" oninput="autoFill()" required />
+        </div>
+
+        <hr class="form-divider" />
+        <div class="form-section-label">Fund Allocation</div>
+
+        <!-- Fund fields (generated by JS) -->
+        <div id="fundFields" style="display:contents"></div>
+
+        <!-- Kite Total -->
+        <div class="form-group fg-full">
+          <label for="f_kiteTotal">
+            Kite Total
+            <span class="tgt">= Principal &minus; Junior BeES (auto)</span>
+          </label>
+          <input type="number" id="f_kiteTotal" class="readonly-computed"
+                 readonly tabindex="-1" placeholder="0.00" />
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Entry</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── SCRIPT ─────────────────────────────────────────────────────────────── -->
+<script>
+'use strict';
+
+// ── Constants ──────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'inv_entries';
+
+const FUNDS = [
+  { key: 'niftyBees',   label: 'Nifty BeES',         target: 0.30, color: '#2563eb' },
+  { key: 'juniorBees',  label: 'Junior BeES',         target: 0.25, color: '#7c3aed' },
+  { key: 'nasdaq100',   label: 'Nasdaq 100 ETF',      target: 0.15, color: '#0891b2' },
+  { key: 'goldBees',    label: 'Gold BeES',           target: 0.05, color: '#d97706' },
+  { key: 'smallcap250', label: 'Nifty SmallCap 250',  target: 0.25, color: '#059669' },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+let entries = [];
+let activeFilter = 'all';
+let barChart    = null;
+let donutChart  = null;
+
+// ── Storage ────────────────────────────────────────────────────────────────
+function loadEntries() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    entries = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(entries)) entries = [];
+  } catch (_) {
+    entries = [];
+  }
+}
+
+function persistEntries() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('investForm').reset();
+  document.getElementById('f_date').value = todayISO();
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f_principal').focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── Auto-fill fund fields ──────────────────────────────────────────────────
+function autoFill() {
+  const principal = parseFloat(document.getElementById('f_principal').value) || 0;
+  FUNDS.forEach(f => {
+    const el = document.getElementById('f_' + f.key);
+    if (!el) return;
+    el.value = principal > 0 ? roundTwo(principal * f.target) : '';
+  });
+  recalcKite();
+}
+
+function recalcKite() {
+  const principal   = parseFloat(document.getElementById('f_principal').value)  || 0;
+  const juniorBees  = parseFloat(document.getElementById('f_juniorBees').value) || 0;
+  const kite = Math.max(0, principal - juniorBees);
+  document.getElementById('f_kiteTotal').value = roundTwo(kite);
+}
+
+// ── Save entry ─────────────────────────────────────────────────────────────
+function saveEntry(e) {
+  e.preventDefault();
+  const date = document.getElementById('f_date').value;
+  const principal = parseFloat(document.getElementById('f_principal').value);
+
+  if (!date) { alert('Please choose a date.'); return; }
+  if (isNaN(principal) || principal <= 0) { alert('Please enter a valid principal amount.'); return; }
+
+  const entry = {
+    id: uid(),
+    date,
+    label:     document.getElementById('f_label').value.trim(),
+    principal,
+  };
+
+  FUNDS.forEach(f => {
+    entry[f.key] = parseFloat(document.getElementById('f_' + f.key).value) || 0;
+  });
+
+  entry.kiteTotal = Math.max(0, entry.principal - entry.juniorBees);
+
+  // Insert sorted newest-first
+  entries.unshift(entry);
+  entries.sort((a, b) => b.date.localeCompare(a.date));
+
+  persistEntries();
+  closeModal();
+  render();
+}
+
+// ── Delete entry ───────────────────────────────────────────────────────────
+function deleteEntry(id) {
+  if (!confirm('Delete this entry? This cannot be undone.')) return;
+  entries = entries.filter(e => e.id !== id);
+  persistEntries();
+  render();
+}
+
+// ── Filter ─────────────────────────────────────────────────────────────────
+function setFilter(val, btn) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function visibleEntries() {
+  if (activeFilter === 'all') return entries;
+  const ym = todayISO().slice(0, 7);
+  return entries.filter(e => e.date.startsWith(ym));
+}
+
+// ── Formatters ─────────────────────────────────────────────────────────────
+function fmt(n) {
+  return '\u20B9' + Number(n || 0).toLocaleString('en-IN', {
+    minimumFractionDigits: 0, maximumFractionDigits: 2
+  });
+}
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function fmtDate(d) {
+  const [y, m, dd] = d.split('-');
+  return `${+dd} ${MONTHS[+m - 1]} '${y.slice(2)}`;
+}
+
+function fmtMonthLabel(ym) {
+  const [y, m] = ym.split('-');
+  return `${MONTHS[+m - 1]} '${y.slice(2)}`;
+}
+
+function roundTwo(n) { return Math.round(n * 100) / 100; }
+function todayISO()  { return new Date().toISOString().slice(0, 10); }
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+// ── Metric Cards ──────────────────────────────────────────────────────────
+function renderMetrics() {
+  const total = entries.reduce((s, e) => s + (e.principal || 0), 0);
+  const grid  = document.getElementById('metricsGrid');
+
+  let html = `
+    <div class="metric-card mc-total">
+      <div class="mc-label">Total Invested</div>
+      <div class="mc-value">${fmt(total)}</div>
+      <div class="mc-sub">${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}</div>
+    </div>`;
+
+  FUNDS.forEach(f => {
+    const fundTotal = entries.reduce((s, e) => s + (e[f.key] || 0), 0);
+    const pct = total > 0 ? (fundTotal / total * 100) : 0;
+    const tgt = f.target * 100;
+    const diff = pct - tgt;
+    const diffStr = diff === 0 ? 'on target'
+      : (diff > 0 ? `+${diff.toFixed(1)}%` : `${diff.toFixed(1)}%`);
+
+    html += `
+      <div class="metric-card">
+        <div class="mc-label">
+          <span class="mc-dot" style="background:${f.color}"></span>${f.label}
+        </div>
+        <div class="mc-value" style="font-size:1.15rem">${fmt(fundTotal)}</div>
+        <div class="mc-sub">${pct.toFixed(1)}% of total &middot; target ${tgt.toFixed(0)}% (${diffStr})</div>
+      </div>`;
+  });
+
+  grid.innerHTML = html;
+}
+
+// ── Table ──────────────────────────────────────────────────────────────────
+function renderTable() {
+  const data = visibleEntries();
+  const body = document.getElementById('logBody');
+
+  if (data.length === 0) {
+    body.innerHTML = `<tr class="empty-row"><td colspan="10">
+      No entries${activeFilter === 'month' ? ' this month' : ' yet'}.
+      Click <strong>+ Log Investment</strong> to get started.
+    </td></tr>`;
+    return;
+  }
+
+  body.innerHTML = data.map(e => `
+    <tr>
+      <td>${fmtDate(e.date)}</td>
+      <td class="td-label">${escHtml(e.label) || '<span style="color:#d1d5db">—</span>'}</td>
+      <td class="td-amount td-total">${fmt(e.principal)}</td>
+      ${FUNDS.map(f => `<td class="td-amount">${fmt(e[f.key])}</td>`).join('')}
+      <td class="td-amount td-total">${fmt(e.kiteTotal)}</td>
+      <td><button class="btn btn-danger" onclick="deleteEntry('${escAttr(e.id)}')">&#x2715;</button></td>
+    </tr>`).join('');
+}
+
+// ── Bar Chart ──────────────────────────────────────────────────────────────
+function renderBarChart() {
+  const ctx = document.getElementById('barChart');
+
+  // Build month buckets in chronological order
+  const monthOrder = [];
+  const monthMap   = {};
+
+  // Collect all months from entries (oldest → newest)
+  [...entries].reverse().forEach(e => {
+    const ym = e.date.slice(0, 7);
+    if (!monthMap[ym]) { monthMap[ym] = {}; monthOrder.push(ym); }
+    FUNDS.forEach(f => {
+      monthMap[ym][f.key] = (monthMap[ym][f.key] || 0) + (e[f.key] || 0);
+    });
+  });
+
+  const labels   = monthOrder.map(fmtMonthLabel);
+  const datasets = FUNDS.map(f => ({
+    label: f.label,
+    data:  monthOrder.map(ym => monthMap[ym][f.key] || 0),
+    backgroundColor: f.color,
+    borderRadius: { topLeft: 3, topRight: 3 },
+    borderSkipped: false,
+  }));
+
+  if (barChart) barChart.destroy();
+
+  if (labels.length === 0) {
+    ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+    barChart = null;
+    return;
+  }
+
+  barChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 11, padding: 14, font: { size: 11 } },
+        },
+        tooltip: {
+          callbacks: {
+            label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y)}`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: { display: false },
+          ticks: { font: { size: 11 }, color: '#6b7280' },
+        },
+        y: {
+          stacked: true,
+          grid: { color: '#f3f4f6' },
+          border: { dash: [4, 4] },
+          ticks: {
+            font: { size: 11 }, color: '#6b7280',
+            callback: v => v >= 1000 ? '\u20B9' + (v / 1000).toFixed(0) + 'k' : '\u20B9' + v,
+          },
+        },
+      },
+    },
+  });
+}
+
+// ── Donut Chart ────────────────────────────────────────────────────────────
+function renderDonutChart() {
+  const ctx    = document.getElementById('donutChart');
+  const totals = FUNDS.map(f => entries.reduce((s, e) => s + (e[f.key] || 0), 0));
+  const grand  = totals.reduce((a, b) => a + b, 0);
+
+  if (donutChart) donutChart.destroy();
+
+  if (grand === 0) {
+    ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+    donutChart = null;
+    return;
+  }
+
+  donutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels:   FUNDS.map(f => f.label),
+      datasets: [{
+        data:            totals,
+        backgroundColor: FUNDS.map(f => f.color),
+        borderWidth:     2,
+        borderColor:     '#fff',
+        hoverOffset:     6,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 11, padding: 12, font: { size: 11 } },
+        },
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const pct = grand > 0 ? (c.parsed / grand * 100).toFixed(1) : 0;
+              return ` ${c.label}: ${fmt(c.parsed)} (${pct}%)`;
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+// ── Export CSV ─────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (entries.length === 0) { alert('Nothing to export yet.'); return; }
+
+  const headers = ['Date', 'Label', 'Principal (INR)',
+    ...FUNDS.map(f => `${f.label} (INR)`), 'Kite Total (INR)'];
+
+  const rows = entries.map(e => [
+    e.date,
+    csvCell(e.label || ''),
+    e.principal,
+    ...FUNDS.map(f => e[f.key] || 0),
+    e.kiteTotal || 0,
+  ]);
+
+  const csv  = [headers, ...rows].map(r => r.join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), {
+    href:     url,
+    download: `etf-investments-${todayISO()}.csv`,
+  });
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function csvCell(s) {
+  return '"' + String(s).replace(/"/g, '""') + '"';
+}
+
+// ── XSS helpers ────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) { return escHtml(s); }
+
+// ── Build modal fund fields ────────────────────────────────────────────────
+function buildFundFields() {
+  const container = document.getElementById('fundFields');
+  container.innerHTML = FUNDS.map(f => `
+    <div class="form-group">
+      <label for="f_${f.key}">
+        <span class="fdot" style="background:${f.color}"></span>
+        ${escHtml(f.label)}
+        <span class="tgt">(${(f.target * 100).toFixed(0)}%)</span>
+      </label>
+      <input type="number" id="f_${f.key}" min="0" step="0.01"
+             placeholder="0.00" oninput="recalcKite()" />
+    </div>`).join('');
+}
+
+// ── Master render ──────────────────────────────────────────────────────────
+function render() {
+  renderMetrics();
+  renderTable();
+  renderBarChart();
+  renderDonutChart();
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+buildFundFields();
+loadEntries();
+render();
+</script>
+</body>
+</html>
