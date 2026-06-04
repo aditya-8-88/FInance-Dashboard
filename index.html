@@ -350,6 +350,9 @@
     .fc-foot { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-top: 0.15rem; }
     .fc-toggle { background: none; border: none; color: var(--text-muted); font-size: 0.74rem; font-weight: 600; cursor: pointer; padding: 0.2rem 0; }
     .fc-toggle:hover { color: var(--text-primary); }
+    .fc-foot-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .fc-edit { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.74rem; }
+    .fc-edit:hover { color: var(--accent-color, var(--text-primary)); }
     .fc-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.74rem; }
     .fc-del:hover { color: var(--danger-color); }
     .fc-history { display: none; flex-direction: column; gap: 0.35rem; border-top: 1px solid var(--border-strong); padding-top: 0.5rem; max-height: 190px; overflow-y: auto; }
@@ -359,6 +362,28 @@
     .fc-hrow .h-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.72rem; }
     .fc-hrow .h-del:hover { color: var(--danger-color); }
     .fc-empty { font-size: 0.74rem; color: var(--text-faint); padding: 0.3rem 0; }
+
+    /* ── Month groups + drift ────────────────────────────────────────────── */
+    .fc-mgroup { display: flex; flex-direction: column; gap: 0.28rem; }
+    .fc-mgroup + .fc-mgroup { border-top: 1px solid var(--border-strong); padding-top: 0.4rem; }
+    .fc-mhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; font-size: 0.78rem; color: var(--text-secondary); }
+    .fc-mhead:hover { color: var(--text-primary); }
+    .fc-mhead .m-left  { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+    .fc-mhead .m-right { display: flex; align-items: center; gap: 7px; }
+    .fc-mhead .m-amt   { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .m-cnt { background: var(--tab-bg); color: var(--text-muted); font-size: 0.62rem; font-weight: 700; padding: 0 5px; border-radius: 10px; }
+    .drift-chip { font-size: 0.66rem; font-weight: 700; padding: 1px 7px; border-radius: 20px; white-space: nowrap; }
+    .drift-over  { background: rgba(217,119,6,0.14); color: #b45309; }
+    .drift-under { background: rgba(37,99,235,0.14); color: #1d4ed8; }
+    .drift-on    { background: rgba(5,150,105,0.14); color: #047857; }
+    [data-theme="dark"] .drift-over  { color: #fbbf24; }
+    [data-theme="dark"] .drift-under { color: #60a5fa; }
+    [data-theme="dark"] .drift-on    { color: #34d399; }
+    .drift-bar { position: relative; height: 5px; border-radius: 5px; background: var(--tab-bg); margin: 1px 0 2px; }
+    .drift-bar .center { position: absolute; left: 50%; top: -1px; bottom: -1px; width: 1px; background: var(--text-faint); opacity: 0.7; }
+    .drift-bar .fill   { position: absolute; top: 0; bottom: 0; border-radius: 5px; }
+    .fc-mentries { display: none; flex-direction: column; gap: 0.3rem; padding-left: 0.5rem; margin: 0.1rem 0 0.2rem 2px; border-left: 2px solid var(--border-strong); }
+    .fc-mentries.open { display: flex; }
 
     /* ── Empty state ─────────────────────────────────────────────────────── */
     .empty-state {
@@ -374,6 +399,64 @@
     .bulk-fund-row .bf-label { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--text-secondary); min-width: 0; }
     .bulk-fund-row .bf-label .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .bulk-fund-row input { max-width: 135px; }
+
+    /* ── Inline field errors ─────────────────────────────────────────────── */
+    .field-error {
+      font-size: 0.72rem; color: var(--danger-color); font-weight: 600;
+      margin-top: 1px; display: none;
+    }
+    .field-hint {
+      font-size: 0.72rem; color: var(--text-muted); font-weight: 500;
+      margin-top: 1px; display: none;
+    }
+    .field-hint.show { display: block; }
+    .form-group.invalid .field-hint { display: none; }
+    .form-group.invalid .field-error { display: block; }
+    .form-group.invalid input {
+      border-color: var(--danger-color);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.14);
+    }
+    @keyframes shake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
+    }
+    .form-group.invalid input { animation: shake 0.32s ease both; }
+
+    /* ── Toast notifications ─────────────────────────────────────────────── */
+    .toast-wrap {
+      position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+      z-index: 400; display: flex; flex-direction: column; gap: 0.55rem;
+      width: max-content; max-width: calc(100vw - 2rem); pointer-events: none;
+    }
+    .toast {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: var(--surface); color: var(--text-primary);
+      border: 1px solid var(--border); border-left: 4px solid var(--text-faint);
+      border-radius: 10px; padding: 0.7rem 1rem;
+      box-shadow: 0 10px 32px rgba(0,0,0,0.18);
+      font-size: 0.85rem; font-weight: 500;
+      opacity: 0; transform: translateY(-12px); transition: opacity 0.2s, transform 0.2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast .t-icon { font-size: 1rem; line-height: 1; flex-shrink: 0; }
+    .toast.t-error   { border-left-color: var(--danger-color); }
+    .toast.t-success { border-left-color: #059669; }
+    .toast.t-info    { border-left-color: #2563eb; }
+
+    /* ── Confirm dialog ──────────────────────────────────────────────────── */
+    .confirm-modal { max-width: 420px; }
+    .confirm-modal .cm-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 1rem;
+      background: var(--danger-bg); color: var(--danger-color);
+    }
+    .confirm-modal h3 { font-size: 1.02rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.45rem; }
+    .confirm-modal p  { font-size: 0.86rem; color: var(--text-muted); line-height: 1.5; }
+    .btn-solid-danger { background: var(--danger-color); color: #fff; }
+    .btn-solid-danger:hover { background: #b91c1c; }
 
     /* ── Scrollbar ───────────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -445,20 +528,24 @@
 <!-- ── ADD FUND MODAL ─────────────────────────────────────────────────────── -->
 <div class="overlay" id="fundOverlay" onclick="overlayClick(event, 'fundOverlay')">
   <div class="modal">
-    <div class="modal-heading">Add Fund</div>
+    <div class="modal-heading" id="fundHeading">Add Fund</div>
     <form id="fundForm" onsubmit="saveFund(event)" novalidate>
       <div class="form-grid">
         <div class="form-group fg-full">
           <label for="nf_name">Fund Name</label>
           <input type="text" id="nf_name" placeholder="e.g. Motilal Oswal Nasdaq 100 FoF" maxlength="80" required />
+          <span class="field-error" id="err_nf_name">Please enter a fund name.</span>
         </div>
         <div class="form-group">
-          <label for="nf_target">Target Allocation <span class="tgt">(% optional)</span></label>
-          <input type="number" id="nf_target" min="0" max="100" step="0.1" placeholder="e.g. 25" />
+          <label for="nf_target">Target Allocation (%)</label>
+          <input type="number" id="nf_target" min="0" max="100" step="0.1" placeholder="e.g. 25" required />
+          <span class="field-hint" id="hint_nf_target"></span>
+          <span class="field-error" id="err_nf_target">Enter a value between 0 and 100.</span>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="nf_initial_group">
           <label for="nf_initial">Initial Amount <span class="tgt">(optional)</span></label>
           <input type="number" id="nf_initial" min="0" step="0.01" placeholder="0.00" />
+          <span class="field-error" id="err_nf_initial">Amount can't be negative.</span>
         </div>
         <div class="form-group fg-full">
           <label for="nf_desc">Description <span class="tgt">(optional)</span></label>
@@ -467,7 +554,7 @@
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" onclick="closeModal('fundOverlay')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Fund</button>
+        <button type="submit" class="btn btn-primary" id="fundSubmit">Add Fund</button>
       </div>
     </form>
   </div>
@@ -483,10 +570,12 @@
         <div class="form-group">
           <label for="q_date">Date</label>
           <input type="date" id="q_date" required />
+          <span class="field-error" id="err_q_date">Please choose a date.</span>
         </div>
         <div class="form-group">
           <label for="q_amount">Amount (&#x20B9;)</label>
           <input type="number" id="q_amount" min="0" step="0.01" placeholder="0.00" required />
+          <span class="field-error" id="err_q_amount">Enter an amount greater than 0.</span>
         </div>
       </div>
       <div class="modal-actions">
@@ -504,8 +593,9 @@
     <form id="bulkForm" onsubmit="saveBulk(event)" novalidate>
       <div class="form-grid">
         <div class="form-group">
-          <label for="b_month">Month</label>
-          <input type="month" id="b_month" required />
+          <label for="b_date">Date</label>
+          <input type="date" id="b_date" required />
+          <span class="field-error" id="err_b_date">Please choose a date.</span>
         </div>
         <div class="form-group">
           <label for="b_principal">Principal (&#x20B9;) <span class="tgt">(auto-splits)</span></label>
@@ -528,6 +618,22 @@
   </div>
 </div>
 
+<!-- ── CONFIRM DIALOG ─────────────────────────────────────────────────────── -->
+<div class="overlay" id="confirmOverlay" onclick="overlayClick(event, 'confirmOverlay')">
+  <div class="modal confirm-modal">
+    <div class="cm-icon" id="confirmIcon">&#x26A0;&#xFE0F;</div>
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmBody">This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="confirmCancel">Cancel</button>
+      <button type="button" class="btn btn-solid-danger" id="confirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOASTS ─────────────────────────────────────────────────────────────── -->
+<div class="toast-wrap" id="toastWrap"></div>
+
 <!-- ── SCRIPT ─────────────────────────────────────────────────────────────── -->
 <script>
 'use strict';
@@ -549,6 +655,8 @@ let activeFilter = 'all';
 let barChart   = null;
 let donutChart = null;
 const openHistory = new Set();   // fund ids whose history is expanded
+const openMonths  = new Set();   // `${fundId}|${ym}` keys whose monthly entries are expanded
+let editingFundId = null;        // id of fund currently being edited, or null when adding
 
 // ── Storage ────────────────────────────────────────────────────────────────
 function loadAll() {
@@ -583,35 +691,184 @@ function escHtml(s) {
 function fundById(id)   { return funds.find(f => f.id === id); }
 function fundTotal(id)  { return invs.filter(i => i.fundId === id).reduce((s, i) => s + (i.amount || 0), 0); }
 function grandTotal()   { return invs.reduce((s, i) => s + (i.amount || 0), 0); }
+function monthGrandTotal(ym){ return invs.filter(i => i.date.startsWith(ym)).reduce((s, i) => s + (i.amount || 0), 0); }
+function fundMonthTotal(id, ym){ return invs.filter(i => i.fundId === id && i.date.startsWith(ym)).reduce((s, i) => s + (i.amount || 0), 0); }
+
+// Monthly over/under vs target -> chip + diverging bar centred on the target
+function driftInfo(monthPct, tgt) {
+  if (!tgt || tgt <= 0) return { chip: '', bar: '' };
+  const drift = monthPct - tgt;
+  const onT   = Math.abs(drift) < 0.05;
+  const cls   = onT ? 'drift-on' : (drift > 0 ? 'drift-over' : 'drift-under');
+  const txt   = onT ? 'on target' : (drift > 0 ? `+${drift.toFixed(1)}%` : `${drift.toFixed(1)}%`);
+  const title = `${monthPct.toFixed(1)}% of month \u00B7 target ${tgt}%`;
+  const chip  = `<span class="drift-chip ${cls}" title="${title}">${txt}</span>`;
+  const half  = (Math.min(1, Math.abs(drift) / 50) * 50).toFixed(1);
+  let fill;
+  if (onT)            fill = 'left:50%;width:0';
+  else if (drift > 0) fill = `left:50%;width:${half}%;background:#d97706`;
+  else                fill = `left:${(50 - half)}%;width:${half}%;background:#2563eb`;
+  const bar = `<div class="drift-bar"><span class="center"></span><span class="fill" style="${fill}"></span></div>`;
+  return { chip, bar };
+}
 
 // ── Generic modal handling ──────────────────────────────────────────────────
 function openOverlay(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id)  { document.getElementById(id).classList.remove('open'); }
 function overlayClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
+  if (e.key === 'Escape') {
+    if (document.getElementById('confirmOverlay').classList.contains('open')) { _confirmClose(false); return; }
+    document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
+  }
+});
+
+// ── Toast notifications ─────────────────────────────────────────────────────
+function toast(message, type = 'info', duration = 3200) {
+  const icons = { info: '\u2139\uFE0F', success: '\u2705', error: '\u26A0\uFE0F' };
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast t-${type}`;
+  el.innerHTML = `<span class="t-icon">${icons[type] || icons.info}</span><span>${escHtml(message)}</span>`;
+  wrap.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 220);
+  }, duration);
+}
+
+// ── Inline field errors ─────────────────────────────────────────────────────
+function setFieldError(inputId, message) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const group = input.closest('.form-group');
+  if (group) {
+    group.classList.remove('invalid');   // restart shake animation
+    void group.offsetWidth;
+    group.classList.add('invalid');
+    if (message) {
+      const err = group.querySelector('.field-error');
+      if (err) err.textContent = message;
+    }
+  }
+}
+function clearFieldErrors(formId) {
+  document.querySelectorAll(`#${formId} .form-group.invalid`).forEach(g => g.classList.remove('invalid'));
+}
+
+// ── Styled confirm dialog (Promise-based) ───────────────────────────────────
+let _confirmResolve = null;
+function confirmDialog({ title = 'Are you sure?', body = 'This action cannot be undone.', confirmText = 'Delete', icon = '\u26A0\uFE0F' } = {}) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmBody').textContent  = body;
+  document.getElementById('confirmIcon').textContent  = icon;
+  document.getElementById('confirmOk').textContent    = confirmText;
+  openOverlay('confirmOverlay');
+  return new Promise(resolve => { _confirmResolve = resolve; });
+}
+function _confirmClose(result) {
+  closeModal('confirmOverlay');
+  if (_confirmResolve) { _confirmResolve(result); _confirmResolve = null; }
+}
+document.getElementById('confirmOk').addEventListener('click', () => _confirmClose(true));
+document.getElementById('confirmCancel').addEventListener('click', () => _confirmClose(false));
+document.getElementById('confirmOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('confirmOverlay')) _confirmClose(false);
 });
 
 // ── Add Fund ────────────────────────────────────────────────────────────────
 function openFundModal() {
+  editingFundId = null;
   document.getElementById('fundForm').reset();
+  clearFieldErrors('fundForm');
+  document.getElementById('fundHeading').textContent = 'Add Fund';
+  document.getElementById('fundSubmit').textContent = 'Add Fund';
+  document.getElementById('nf_initial_group').style.display = '';
+  setTargetHint(null);
   openOverlay('fundOverlay');
   setTimeout(() => document.getElementById('nf_name').focus(), 80);
 }
 
+function editFund(id) {
+  const f = fundById(id);
+  if (!f) return;
+  editingFundId = id;
+  document.getElementById('fundForm').reset();
+  clearFieldErrors('fundForm');
+  document.getElementById('fundHeading').textContent = 'Edit Fund';
+  document.getElementById('fundSubmit').textContent = 'Save Changes';
+  document.getElementById('nf_name').value = f.name;
+  document.getElementById('nf_target').value = f.target;
+  document.getElementById('nf_desc').value = f.description || '';
+  document.getElementById('nf_initial_group').style.display = 'none';
+  setTargetHint(id);
+  openOverlay('fundOverlay');
+  setTimeout(() => document.getElementById('nf_name').focus(), 80);
+}
+
+// Show how much allocation is still available (excluding the fund being edited).
+function setTargetHint(excludeId) {
+  const othersTotal = funds.reduce((s, x) => s + (x.id === excludeId ? 0 : (x.target || 0)), 0);
+  const remaining = roundTwo(100 - othersTotal);
+  const hint = document.getElementById('hint_nf_target');
+  if (othersTotal <= 0) {
+    hint.textContent = '';
+    hint.classList.remove('show');
+  } else if (remaining < 0) {
+    hint.textContent = `Other funds already total ${roundTwo(othersTotal)}% — over 100%. Lower them first.`;
+    hint.classList.add('show');
+  } else {
+    hint.textContent = `${remaining}% of 100% still available to allocate.`;
+    hint.classList.add('show');
+  }
+}
+
 function saveFund(e) {
   e.preventDefault();
+  clearFieldErrors('fundForm');
   const name = document.getElementById('nf_name').value.trim();
-  if (!name) { alert('Please enter a fund name.'); return; }
+  if (!name) { setFieldError('nf_name', 'Please enter a fund name.'); return; }
+
+  // Prevent duplicate fund names (case-insensitive, ignoring the fund being edited).
+  const nameKey = name.toLowerCase();
+  const dup = funds.some(x => x.id !== editingFundId && (x.name || '').trim().toLowerCase() === nameKey);
+  if (dup) { setFieldError('nf_name', 'A fund with this name already exists.'); return; }
 
   const target  = parseFloat(document.getElementById('nf_target').value);
-  const initial = parseFloat(document.getElementById('nf_initial').value);
+  if (isNaN(target) || target < 0 || target > 100) { setFieldError('nf_target', 'Enter a value between 0 and 100.'); return; }
   const desc    = document.getElementById('nf_desc').value.trim();
+
+  // Total target allocation across all funds must not exceed 100%.
+  const othersTotal = funds.reduce((s, x) => s + (x.id === editingFundId ? 0 : (x.target || 0)), 0);
+  const remaining = roundTwo(100 - othersTotal);
+  if (roundTwo(othersTotal + target) > 100) {
+    setFieldError('nf_target', `Total can't exceed 100%. Only ${remaining}% left to allocate.`);
+    return;
+  }
+
+  if (editingFundId) {
+    const f = fundById(editingFundId);
+    if (f) {
+      f.name = name;
+      f.target = target;
+      f.description = desc;
+      persistFunds();
+    }
+    editingFundId = null;
+    closeModal('fundOverlay');
+    render();
+    toast(`Updated “${name}”`, 'success');
+    return;
+  }
+
+  const initial = parseFloat(document.getElementById('nf_initial').value);
+  if (!isNaN(initial) && initial < 0) { setFieldError('nf_initial', "Amount can't be negative."); return; }
 
   const fund = {
     id:          uid(),
     name,
-    target:      isNaN(target) ? 0 : target,
+    target,
     description: desc,
     color:       PALETTE[funds.length % PALETTE.length],
   };
@@ -625,17 +882,25 @@ function saveFund(e) {
 
   closeModal('fundOverlay');
   render();
+  toast(`Added “${name}”`, 'success');
 }
 
-function deleteFund(id) {
+async function deleteFund(id) {
   const f = fundById(id);
   if (!f) return;
-  if (!confirm(`Delete "${f.name}" and all its investments? This cannot be undone.`)) return;
+  const ok = await confirmDialog({
+    title: `Delete “${f.name}”?`,
+    body: 'This removes the fund and all its investments. This cannot be undone.',
+    confirmText: 'Delete fund',
+  });
+  if (!ok) return;
   funds = funds.filter(x => x.id !== id);
   invs  = invs.filter(x => x.fundId !== id);
   openHistory.delete(id);
+  [...openMonths].forEach(k => { if (k.startsWith(id + '|')) openMonths.delete(k); });
   persistFunds(); persistInvs();
   render();
+  toast(`Deleted “${f.name}”`, 'info');
 }
 
 // ── Quick add investment (per fund card) ────────────────────────────────────
@@ -643,8 +908,10 @@ function openQuickAdd(fundId) {
   const f = fundById(fundId);
   if (!f) return;
   document.getElementById('quickForm').reset();
+  clearFieldErrors('quickForm');
   document.getElementById('q_fundId').value = fundId;
   document.getElementById('q_date').value   = todayISO();
+  document.getElementById('q_date').max      = todayISO();
   document.getElementById('quickHeading').textContent = `Add Investment \u00B7 ${f.name}`;
   openOverlay('quickOverlay');
   setTimeout(() => document.getElementById('q_amount').focus(), 80);
@@ -652,22 +919,37 @@ function openQuickAdd(fundId) {
 
 function saveQuick(e) {
   e.preventDefault();
+  clearFieldErrors('quickForm');
   const fundId = document.getElementById('q_fundId').value;
   const date   = document.getElementById('q_date').value;
   const amount = parseFloat(document.getElementById('q_amount').value);
-  if (!date) { alert('Please choose a date.'); return; }
-  if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount.'); return; }
+  if (!date) { setFieldError('q_date', 'Please choose a date.'); return; }
+  if (date > todayISO()) { setFieldError('q_date', "Date can't be in the future."); return; }
+  if (isNaN(amount) || amount <= 0) { setFieldError('q_amount', 'Enter an amount greater than 0.'); return; }
   invs.push({ id: uid(), fundId, date, amount: roundTwo(amount) });
   persistInvs();
   closeModal('quickOverlay');
   render();
+  const f = fundById(fundId);
+  toast(`Added ${fmt(amount)} to ${f ? f.name : 'fund'}`, 'success');
 }
 
 // ── Bulk log investment (all funds for a month) ─────────────────────────────
 function openBulkModal() {
-  if (funds.length === 0) { alert('Add at least one fund first.'); openFundModal(); return; }
+  if (funds.length === 0) { toast('Add at least one fund first.', 'info'); openFundModal(); return; }
+  const totalTarget = roundTwo(funds.reduce((s, f) => s + (f.target || 0), 0));
+  if (totalTarget !== 100) {
+    const diff = roundTwo(100 - totalTarget);
+    const msg = diff > 0
+      ? `Allocate ${diff}% more before logging — fund targets must total 100% (currently ${totalTarget}%).`
+      : `Targets total ${totalTarget}% — reduce by ${roundTwo(-diff)}% to reach 100% before logging.`;
+    toast(msg, 'error', 4500);
+    return;
+  }
   document.getElementById('bulkForm').reset();
-  document.getElementById('b_month').value = thisMonthISO();
+  clearFieldErrors('bulkForm');
+  document.getElementById('b_date').value = todayISO();
+  document.getElementById('b_date').max   = todayISO();
   buildBulkFields();
   openOverlay('bulkOverlay');
 }
@@ -688,7 +970,7 @@ function buildBulkFields() {
     </div>`).join('');
 }
 
-// Principal -> split across funds by target weight (or equally if no targets)
+// Principal -> split across funds by literal target % (or equally if no targets)
 function distributeBulk() {
   const principal   = parseFloat(document.getElementById('b_principal').value) || 0;
   const totalTarget = funds.reduce((s, f) => s + (f.target || 0), 0);
@@ -696,7 +978,7 @@ function distributeBulk() {
     const el = document.getElementById('b_' + f.id);
     if (!el) return;
     let amt;
-    if (totalTarget > 0) amt = principal * ((f.target || 0) / totalTarget);
+    if (totalTarget > 0) amt = principal * ((f.target || 0) / 100);
     else                 amt = principal / funds.length;
     el.value = principal > 0 ? roundTwo(amt) : '';
   });
@@ -713,9 +995,11 @@ function recalcBulkPrincipal() {
 
 function saveBulk(e) {
   e.preventDefault();
-  const month = document.getElementById('b_month').value;
-  if (!month) { alert('Please choose a month.'); return; }
-  const date = month + '-01';
+  clearFieldErrors('bulkForm');
+  const month = document.getElementById('b_date').value;
+  if (!month) { setFieldError('b_date', 'Please choose a date.'); return; }
+  if (month > todayISO()) { setFieldError('b_date', "Date can't be in the future."); return; }
+  const date = month;
 
   let added = 0;
   funds.forEach(f => {
@@ -723,18 +1007,27 @@ function saveBulk(e) {
     const amt = parseFloat(el && el.value) || 0;
     if (amt > 0) { invs.push({ id: uid(), fundId: f.id, date, amount: roundTwo(amt) }); added++; }
   });
-  if (added === 0) { alert('Enter at least one amount.'); return; }
+  if (added === 0) { toast('Enter at least one amount.', 'error'); return; }
 
   persistInvs();
   closeModal('bulkOverlay');
   render();
+  toast(`Logged ${added} investment${added === 1 ? '' : 's'} for ${fmtDate(date)}`, 'success');
 }
 
 // ── Delete a single investment ──────────────────────────────────────────────
-function deleteInv(id) {
+async function deleteInv(id) {
+  const inv = invs.find(i => i.id === id);
+  const ok = await confirmDialog({
+    title: 'Delete this entry?',
+    body: inv ? `Remove ${fmt(inv.amount)} from ${fmtDate(inv.date)}? This cannot be undone.` : 'This cannot be undone.',
+    confirmText: 'Delete entry',
+  });
+  if (!ok) return;
   invs = invs.filter(i => i.id !== id);
   persistInvs();
   render();
+  toast('Entry deleted', 'info');
 }
 
 // ── Filter ──────────────────────────────────────────────────────────────────
@@ -794,6 +1087,7 @@ function renderFunds() {
   }
 
   const total = grandTotal();
+  const cym   = thisMonthISO();
 
   area.innerHTML = `<div class="funds-grid">${funds.map(f => {
     const ft       = fundTotal(f.id);
@@ -803,13 +1097,53 @@ function renderFunds() {
     const isOpen   = openHistory.has(f.id);
     const history  = invs.filter(i => i.fundId === f.id).sort((a, b) => b.date.localeCompare(a.date));
 
-    let meta = `${pct.toFixed(1)}% of total`;
+    // Current-month over/under vs target
+    let monthMeta = '';
     if (tgt > 0) {
-      const diff = pct - tgt;
-      const diffStr = Math.abs(diff) < 0.05 ? 'on target'
-        : (diff > 0 ? `+${diff.toFixed(1)}% over` : `${diff.toFixed(1)}% under`);
-      meta += ` &middot; target ${tgt}% (${diffStr})`;
+      const cmFund  = fundMonthTotal(f.id, cym);
+      const cmGrand = monthGrandTotal(cym);
+      if (cmGrand > 0 && cmFund > 0) {
+        const di = driftInfo(cmFund / cmGrand * 100, tgt);
+        monthMeta = ` &middot; ${fmtMonthLabel(cym)}: ${di.chip}`;
+      } else {
+        monthMeta = ` &middot; target ${tgt}%`;
+      }
     }
+    const meta = `${pct.toFixed(1)}% of total${monthMeta}`;
+
+    // Group history by month (newest first); collapse same-month entries
+    const monthsOrder = [];
+    const byMonth = {};
+    history.forEach(i => {
+      const ym = i.date.slice(0, 7);
+      if (!byMonth[ym]) { byMonth[ym] = []; monthsOrder.push(ym); }
+      byMonth[ym].push(i);
+    });
+
+    const historyHtml = history.length === 0
+      ? '<div class="fc-empty">No investments yet.</div>'
+      : monthsOrder.map(ym => {
+          const list   = byMonth[ym];
+          const mTotal = list.reduce((s, i) => s + (i.amount || 0), 0);
+          const mGrand = monthGrandTotal(ym);
+          const di     = driftInfo(mGrand > 0 ? mTotal / mGrand * 100 : 0, tgt);
+          const mOpen  = openMonths.has(f.id + '|' + ym);
+          return `
+            <div class="fc-mgroup">
+              <div class="fc-mhead" onclick="toggleMonth('${f.id}','${ym}')">
+                <span class="m-left">${mOpen ? '&#9662;' : '&#9656;'} ${fmtMonthLabel(ym)} <span class="m-cnt">${list.length}</span></span>
+                <span class="m-right">${di.chip}<span class="m-amt">${fmt(mTotal)}</span></span>
+              </div>
+              ${di.bar}
+              <div class="fc-mentries ${mOpen ? 'open' : ''}">
+                ${list.map(i => `
+                  <div class="fc-hrow">
+                    <span>${fmtDate(i.date)}</span>
+                    <span class="h-amt">${fmt(i.amount)}<button class="h-del" title="Delete" onclick="deleteInv('${i.id}')">&#x2715;</button></span>
+                  </div>`).join('')}
+              </div>
+            </div>`;
+        }).join('');
 
     return `
       <div class="fund-card">
@@ -823,16 +1157,13 @@ function renderFunds() {
         <div class="fc-bar"><span style="width:${barPct}%;background:${f.color}"></span></div>
         <div class="fc-foot">
           <button class="fc-toggle" onclick="toggleHistory('${f.id}')">${isOpen ? '&#9662; Hide' : '&#9656; History'} (${history.length})</button>
-          <button class="fc-del" onclick="deleteFund('${f.id}')">Delete</button>
+          <div class="fc-foot-actions">
+            <button class="fc-edit" onclick="editFund('${f.id}')">Edit</button>
+            <button class="fc-del" onclick="deleteFund('${f.id}')">Delete</button>
+          </div>
         </div>
         <div class="fc-history ${isOpen ? 'open' : ''}">
-          ${history.length === 0
-            ? '<div class="fc-empty">No investments yet.</div>'
-            : history.map(i => `
-              <div class="fc-hrow">
-                <span>${fmtDate(i.date)}</span>
-                <span class="h-amt">${fmt(i.amount)}<button class="h-del" title="Delete" onclick="deleteInv('${i.id}')">&#x2715;</button></span>
-              </div>`).join('')}
+          ${historyHtml}
         </div>
       </div>`;
   }).join('')}</div>`;
@@ -840,6 +1171,12 @@ function renderFunds() {
 
 function toggleHistory(id) {
   if (openHistory.has(id)) openHistory.delete(id); else openHistory.add(id);
+  renderFunds();
+}
+
+function toggleMonth(fundId, ym) {
+  const k = fundId + '|' + ym;
+  if (openMonths.has(k)) openMonths.delete(k); else openMonths.add(k);
   renderFunds();
 }
 
@@ -988,7 +1325,7 @@ function renderDonutChart() {
 
 // ── Export CSV ──────────────────────────────────────────────────────────────
 function exportCSV() {
-  if (invs.length === 0) { alert('Nothing to export yet.'); return; }
+  if (invs.length === 0) { toast('Nothing to export yet.', 'info'); return; }
 
   const headers = ['Date', 'Fund', 'Amount (INR)'];
   const rows = [...invs].sort((a, b) => b.date.localeCompare(a.date)).map(i => {
