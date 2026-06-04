@@ -310,6 +310,71 @@
       border-top: 1px solid var(--border-strong);
     }
 
+    /* ── Section heading ─────────────────────────────────────────────────── */
+    .section-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.6rem;
+    }
+    .section-head h2 { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+    .section-head .muted { font-size: 0.78rem; color: var(--text-faint); }
+
+    /* ── Fund Cards ──────────────────────────────────────────────────────── */
+    .funds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .fund-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.1rem;
+      display: flex; flex-direction: column; gap: 0.55rem;
+      transition: background 0.22s, border-color 0.22s, box-shadow 0.15s;
+    }
+    .fund-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+    .fc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; }
+    .fc-name { display: flex; align-items: center; gap: 7px; font-size: 0.92rem; font-weight: 700; color: var(--text-primary); }
+    .fc-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .fc-add {
+      width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+      border: 1px solid var(--border); background: var(--ghost-bg); color: var(--text-secondary);
+      cursor: pointer; font-size: 1.05rem; line-height: 1;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .fc-add:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .fc-value { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; line-height: 1.1; }
+    .fc-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+    .fc-meta { font-size: 0.72rem; color: var(--text-faint); }
+    .fc-bar { height: 6px; border-radius: 6px; background: var(--tab-bg); overflow: hidden; }
+    .fc-bar > span { display: block; height: 100%; border-radius: 6px; }
+    .fc-foot { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-top: 0.15rem; }
+    .fc-toggle { background: none; border: none; color: var(--text-muted); font-size: 0.74rem; font-weight: 600; cursor: pointer; padding: 0.2rem 0; }
+    .fc-toggle:hover { color: var(--text-primary); }
+    .fc-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.74rem; }
+    .fc-del:hover { color: var(--danger-color); }
+    .fc-history { display: none; flex-direction: column; gap: 0.35rem; border-top: 1px solid var(--border-strong); padding-top: 0.5rem; max-height: 190px; overflow-y: auto; }
+    .fc-history.open { display: flex; }
+    .fc-hrow { display: flex; justify-content: space-between; align-items: center; font-size: 0.77rem; color: var(--text-secondary); }
+    .fc-hrow .h-amt { font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 8px; }
+    .fc-hrow .h-del { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.72rem; }
+    .fc-hrow .h-del:hover { color: var(--danger-color); }
+    .fc-empty { font-size: 0.74rem; color: var(--text-faint); padding: 0.3rem 0; }
+
+    /* ── Empty state ─────────────────────────────────────────────────────── */
+    .empty-state {
+      background: var(--surface); border: 1px dashed var(--border);
+      border-radius: 12px; padding: 2.6rem 1.5rem; text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .empty-state h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 0.4rem; }
+    .empty-state p  { font-size: 0.84rem; color: var(--text-faint); margin-bottom: 1.1rem; }
+
+    /* ── Bulk allocation row ─────────────────────────────────────────────── */
+    .bulk-fund-row { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; }
+    .bulk-fund-row .bf-label { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: var(--text-secondary); min-width: 0; }
+    .bulk-fund-row .bf-label .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bulk-fund-row input { max-width: 135px; }
+
     /* ── Scrollbar ───────────────────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--scroll-track); border-radius: 10px; }
@@ -321,13 +386,14 @@
 <!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
 <header>
   <div class="header-title">
-    <h1>&#x1F4C8; ETF Investment Dashboard</h1>
-    <p>Zerodha Kite + Coin &nbsp;·&nbsp; Data stored locally in your browser</p>
+    <h1>&#x1F4C8; Investment Tracker</h1>
+    <p>Track what you invest across funds &nbsp;·&nbsp; Stored locally in your browser</p>
   </div>
   <div class="header-actions">
     <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark mode">&#x1F319;</button>
     <button class="btn btn-ghost" onclick="exportCSV()">&#x2B07;&#xFE0F; Export CSV</button>
-    <button class="btn btn-primary" onclick="openModal()">+ Log Investment</button>
+    <button class="btn btn-ghost" onclick="openFundModal()">+ Add Fund</button>
+    <button class="btn btn-primary" onclick="openBulkModal()">Log Investment</button>
   </div>
 </header>
 
@@ -335,7 +401,13 @@
 <main>
   <div class="metrics-grid" id="metricsGrid"></div>
 
-  <div class="charts-row">
+  <div class="section-head">
+    <h2>Your Funds</h2>
+    <span class="muted" id="fundsCount"></span>
+  </div>
+  <div id="fundsArea"></div>
+
+  <div class="charts-row" id="chartsRow">
     <div class="chart-card">
       <h2>Monthly Investment by Fund</h2>
       <div class="chart-canvas-wrap"><canvas id="barChart"></canvas></div>
@@ -359,14 +431,8 @@
         <thead>
           <tr>
             <th>Date</th>
-            <th>Label</th>
-            <th>Principal</th>
-            <th>Nifty BeES</th>
-            <th>Junior BeES</th>
-            <th>Nasdaq 100</th>
-            <th>Gold BeES</th>
-            <th>SmallCap 250</th>
-            <th>Kite Total</th>
+            <th>Fund</th>
+            <th>Amount</th>
             <th></th>
           </tr>
         </thead>
@@ -376,50 +442,86 @@
   </div>
 </main>
 
-<!-- ── MODAL ──────────────────────────────────────────────────────────────── -->
-<div class="overlay" id="overlay" onclick="overlayClick(event)">
-  <div class="modal" id="modal">
-    <div class="modal-heading">Log Investment</div>
-    <form id="investForm" onsubmit="saveEntry(event)" novalidate>
+<!-- ── ADD FUND MODAL ─────────────────────────────────────────────────────── -->
+<div class="overlay" id="fundOverlay" onclick="overlayClick(event, 'fundOverlay')">
+  <div class="modal">
+    <div class="modal-heading">Add Fund</div>
+    <form id="fundForm" onsubmit="saveFund(event)" novalidate>
       <div class="form-grid">
-
-        <!-- Row 1: Date + Label -->
-        <div class="form-group">
-          <label for="f_date">Date</label>
-          <input type="date" id="f_date" required />
-        </div>
-        <div class="form-group">
-          <label for="f_label">Label <span class="tgt">(optional)</span></label>
-          <input type="text" id="f_label" placeholder="e.g. May SIP" maxlength="80" />
-        </div>
-
-        <!-- Principal -->
         <div class="form-group fg-full">
-          <label for="f_principal">Principal (&#x20B9;)</label>
-          <input type="number" id="f_principal" min="0" step="0.01"
-                 placeholder="e.g. 10000" oninput="autoFill()" required />
+          <label for="nf_name">Fund Name</label>
+          <input type="text" id="nf_name" placeholder="e.g. Motilal Oswal Nasdaq 100 FoF" maxlength="80" required />
+        </div>
+        <div class="form-group">
+          <label for="nf_target">Target Allocation <span class="tgt">(% optional)</span></label>
+          <input type="number" id="nf_target" min="0" max="100" step="0.1" placeholder="e.g. 25" />
+        </div>
+        <div class="form-group">
+          <label for="nf_initial">Initial Amount <span class="tgt">(optional)</span></label>
+          <input type="number" id="nf_initial" min="0" step="0.01" placeholder="0.00" />
+        </div>
+        <div class="form-group fg-full">
+          <label for="nf_desc">Description <span class="tgt">(optional)</span></label>
+          <input type="text" id="nf_desc" placeholder="e.g. US tech exposure via FoF" maxlength="160" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('fundOverlay')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Fund</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── QUICK ADD INVESTMENT MODAL ─────────────────────────────────────────── -->
+<div class="overlay" id="quickOverlay" onclick="overlayClick(event, 'quickOverlay')">
+  <div class="modal">
+    <div class="modal-heading" id="quickHeading">Add Investment</div>
+    <form id="quickForm" onsubmit="saveQuick(event)" novalidate>
+      <input type="hidden" id="q_fundId" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="q_date">Date</label>
+          <input type="date" id="q_date" required />
+        </div>
+        <div class="form-group">
+          <label for="q_amount">Amount (&#x20B9;)</label>
+          <input type="number" id="q_amount" min="0" step="0.01" placeholder="0.00" required />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('quickOverlay')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── LOG INVESTMENT (BULK) MODAL ────────────────────────────────────────── -->
+<div class="overlay" id="bulkOverlay" onclick="overlayClick(event, 'bulkOverlay')">
+  <div class="modal">
+    <div class="modal-heading">Log Investment</div>
+    <form id="bulkForm" onsubmit="saveBulk(event)" novalidate>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="b_month">Month</label>
+          <input type="month" id="b_month" required />
+        </div>
+        <div class="form-group">
+          <label for="b_principal">Principal (&#x20B9;) <span class="tgt">(auto-splits)</span></label>
+          <input type="number" id="b_principal" min="0" step="0.01"
+                 placeholder="e.g. 30000" oninput="distributeBulk()" />
         </div>
 
         <hr class="form-divider" />
-        <div class="form-section-label">Fund Allocation</div>
+        <div class="form-section-label">Allocation &mdash; adjust any value freely</div>
 
-        <!-- Fund fields (generated by JS) -->
-        <div id="fundFields" style="display:contents"></div>
-
-        <!-- Kite Total -->
-        <div class="form-group fg-full">
-          <label for="f_kiteTotal">
-            Kite Total
-            <span class="tgt">= Principal &minus; Junior BeES (auto)</span>
-          </label>
-          <input type="number" id="f_kiteTotal" class="readonly-computed"
-                 readonly tabindex="-1" placeholder="0.00" />
-        </div>
-
+        <!-- Fund allocation fields (generated by JS) -->
+        <div id="bulkFields" style="display:contents"></div>
       </div>
 
       <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-ghost" onclick="closeModal('bulkOverlay')">Cancel</button>
         <button type="submit" class="btn btn-primary">Save Entry</button>
       </div>
     </form>
@@ -430,116 +532,212 @@
 <script>
 'use strict';
 
-// ── Constants ──────────────────────────────────────────────────────────────
-const STORAGE_KEY = 'inv_entries';
+// ── Storage keys & palette ─────────────────────────────────────────────────
+const FUNDS_KEY = 'etf_funds';
+const INV_KEY   = 'etf_invs';
+const THEME_KEY = 'dm_pref';
 
-const FUNDS = [
-  { key: 'niftyBees',   label: 'Nifty BeES',         target: 0.30, color: '#2563eb' },
-  { key: 'juniorBees',  label: 'Junior BeES',         target: 0.25, color: '#7c3aed' },
-  { key: 'nasdaq100',   label: 'Nasdaq 100 ETF',      target: 0.15, color: '#0891b2' },
-  { key: 'goldBees',    label: 'Gold BeES',           target: 0.05, color: '#d97706' },
-  { key: 'smallcap250', label: 'Nifty SmallCap 250',  target: 0.25, color: '#059669' },
+const PALETTE = [
+  '#2563eb', '#7c3aed', '#0891b2', '#d97706', '#059669', '#dc2626',
+  '#db2777', '#0d9488', '#ca8a04', '#4f46e5', '#ea580c', '#16a34a',
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
-let entries = [];
+let funds = [];           // { id, name, target, description, color }
+let invs  = [];           // { id, fundId, date, amount }
 let activeFilter = 'all';
-let barChart    = null;
-let donutChart  = null;
+let barChart   = null;
+let donutChart = null;
+const openHistory = new Set();   // fund ids whose history is expanded
 
 // ── Storage ────────────────────────────────────────────────────────────────
-function loadEntries() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    entries = raw ? JSON.parse(raw) : [];
-    if (!Array.isArray(entries)) entries = [];
-  } catch (_) {
-    entries = [];
-  }
+function loadAll() {
+  try { funds = JSON.parse(localStorage.getItem(FUNDS_KEY)) || []; } catch (_) { funds = []; }
+  try { invs  = JSON.parse(localStorage.getItem(INV_KEY))  || []; } catch (_) { invs  = []; }
+  if (!Array.isArray(funds)) funds = [];
+  if (!Array.isArray(invs))  invs  = [];
+}
+function persistFunds() { localStorage.setItem(FUNDS_KEY, JSON.stringify(funds)); }
+function persistInvs()  { localStorage.setItem(INV_KEY,   JSON.stringify(invs)); }
+
+// ── Small helpers ──────────────────────────────────────────────────────────
+function uid()        { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function roundTwo(n)  { return Math.round(n * 100) / 100; }
+function todayISO()   { return new Date().toISOString().slice(0, 10); }
+function thisMonthISO(){ return new Date().toISOString().slice(0, 7); }
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function fmt(n) {
+  return '\u20B9' + Number(n || 0).toLocaleString('en-IN', {
+    minimumFractionDigits: 0, maximumFractionDigits: 2
+  });
+}
+function fmtDate(d)      { const [y, m, dd] = d.split('-'); return `${+dd} ${MONTHS[+m - 1]} '${y.slice(2)}`; }
+function fmtMonthLabel(ym){ const [y, m] = ym.split('-'); return `${MONTHS[+m - 1]} '${y.slice(2)}`; }
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function persistEntries() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
+function fundById(id)   { return funds.find(f => f.id === id); }
+function fundTotal(id)  { return invs.filter(i => i.fundId === id).reduce((s, i) => s + (i.amount || 0), 0); }
+function grandTotal()   { return invs.reduce((s, i) => s + (i.amount || 0), 0); }
 
-// ── Modal ──────────────────────────────────────────────────────────────────
-function openModal() {
-  document.getElementById('investForm').reset();
-  document.getElementById('f_date').value = todayISO();
-  document.getElementById('overlay').classList.add('open');
-  setTimeout(() => document.getElementById('f_principal').focus(), 80);
-}
-
-function closeModal() {
-  document.getElementById('overlay').classList.remove('open');
-}
-
-function overlayClick(e) {
-  if (e.target === document.getElementById('overlay')) closeModal();
-}
-
+// ── Generic modal handling ──────────────────────────────────────────────────
+function openOverlay(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id)  { document.getElementById(id).classList.remove('open'); }
+function overlayClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
 });
 
-// ── Auto-fill fund fields ──────────────────────────────────────────────────
-function autoFill() {
-  const principal = parseFloat(document.getElementById('f_principal').value) || 0;
-  FUNDS.forEach(f => {
-    const el = document.getElementById('f_' + f.key);
-    if (!el) return;
-    el.value = principal > 0 ? roundTwo(principal * f.target) : '';
-  });
-  recalcKite();
+// ── Add Fund ────────────────────────────────────────────────────────────────
+function openFundModal() {
+  document.getElementById('fundForm').reset();
+  openOverlay('fundOverlay');
+  setTimeout(() => document.getElementById('nf_name').focus(), 80);
 }
 
-function recalcKite() {
-  const principal   = parseFloat(document.getElementById('f_principal').value)  || 0;
-  const juniorBees  = parseFloat(document.getElementById('f_juniorBees').value) || 0;
-  const kite = Math.max(0, principal - juniorBees);
-  document.getElementById('f_kiteTotal').value = roundTwo(kite);
-}
-
-// ── Save entry ─────────────────────────────────────────────────────────────
-function saveEntry(e) {
+function saveFund(e) {
   e.preventDefault();
-  const date = document.getElementById('f_date').value;
-  const principal = parseFloat(document.getElementById('f_principal').value);
+  const name = document.getElementById('nf_name').value.trim();
+  if (!name) { alert('Please enter a fund name.'); return; }
 
-  if (!date) { alert('Please choose a date.'); return; }
-  if (isNaN(principal) || principal <= 0) { alert('Please enter a valid principal amount.'); return; }
+  const target  = parseFloat(document.getElementById('nf_target').value);
+  const initial = parseFloat(document.getElementById('nf_initial').value);
+  const desc    = document.getElementById('nf_desc').value.trim();
 
-  const entry = {
-    id: uid(),
-    date,
-    label:     document.getElementById('f_label').value.trim(),
-    principal,
+  const fund = {
+    id:          uid(),
+    name,
+    target:      isNaN(target) ? 0 : target,
+    description: desc,
+    color:       PALETTE[funds.length % PALETTE.length],
   };
+  funds.push(fund);
+  persistFunds();
 
-  FUNDS.forEach(f => {
-    entry[f.key] = parseFloat(document.getElementById('f_' + f.key).value) || 0;
+  if (!isNaN(initial) && initial > 0) {
+    invs.push({ id: uid(), fundId: fund.id, date: todayISO(), amount: roundTwo(initial) });
+    persistInvs();
+  }
+
+  closeModal('fundOverlay');
+  render();
+}
+
+function deleteFund(id) {
+  const f = fundById(id);
+  if (!f) return;
+  if (!confirm(`Delete "${f.name}" and all its investments? This cannot be undone.`)) return;
+  funds = funds.filter(x => x.id !== id);
+  invs  = invs.filter(x => x.fundId !== id);
+  openHistory.delete(id);
+  persistFunds(); persistInvs();
+  render();
+}
+
+// ── Quick add investment (per fund card) ────────────────────────────────────
+function openQuickAdd(fundId) {
+  const f = fundById(fundId);
+  if (!f) return;
+  document.getElementById('quickForm').reset();
+  document.getElementById('q_fundId').value = fundId;
+  document.getElementById('q_date').value   = todayISO();
+  document.getElementById('quickHeading').textContent = `Add Investment \u00B7 ${f.name}`;
+  openOverlay('quickOverlay');
+  setTimeout(() => document.getElementById('q_amount').focus(), 80);
+}
+
+function saveQuick(e) {
+  e.preventDefault();
+  const fundId = document.getElementById('q_fundId').value;
+  const date   = document.getElementById('q_date').value;
+  const amount = parseFloat(document.getElementById('q_amount').value);
+  if (!date) { alert('Please choose a date.'); return; }
+  if (isNaN(amount) || amount <= 0) { alert('Please enter a valid amount.'); return; }
+  invs.push({ id: uid(), fundId, date, amount: roundTwo(amount) });
+  persistInvs();
+  closeModal('quickOverlay');
+  render();
+}
+
+// ── Bulk log investment (all funds for a month) ─────────────────────────────
+function openBulkModal() {
+  if (funds.length === 0) { alert('Add at least one fund first.'); openFundModal(); return; }
+  document.getElementById('bulkForm').reset();
+  document.getElementById('b_month').value = thisMonthISO();
+  buildBulkFields();
+  openOverlay('bulkOverlay');
+}
+
+function buildBulkFields() {
+  const c = document.getElementById('bulkFields');
+  c.innerHTML = funds.map(f => `
+    <div class="form-group fg-full">
+      <div class="bulk-fund-row">
+        <span class="bf-label">
+          <span class="fdot" style="background:${f.color}"></span>
+          <span class="nm">${escHtml(f.name)}</span>
+          ${f.target ? `<span class="tgt">(${f.target}%)</span>` : ''}
+        </span>
+        <input type="number" id="b_${f.id}" min="0" step="0.01"
+               placeholder="0.00" oninput="recalcBulkPrincipal()" />
+      </div>
+    </div>`).join('');
+}
+
+// Principal -> split across funds by target weight (or equally if no targets)
+function distributeBulk() {
+  const principal   = parseFloat(document.getElementById('b_principal').value) || 0;
+  const totalTarget = funds.reduce((s, f) => s + (f.target || 0), 0);
+  funds.forEach(f => {
+    const el = document.getElementById('b_' + f.id);
+    if (!el) return;
+    let amt;
+    if (totalTarget > 0) amt = principal * ((f.target || 0) / totalTarget);
+    else                 amt = principal / funds.length;
+    el.value = principal > 0 ? roundTwo(amt) : '';
   });
+}
 
-  entry.kiteTotal = Math.max(0, entry.principal - entry.juniorBees);
+// Editing any fund value -> principal becomes the sum
+function recalcBulkPrincipal() {
+  const sum = funds.reduce((s, f) => {
+    const el = document.getElementById('b_' + f.id);
+    return s + (parseFloat(el && el.value) || 0);
+  }, 0);
+  document.getElementById('b_principal').value = sum > 0 ? roundTwo(sum) : '';
+}
 
-  // Insert sorted newest-first
-  entries.unshift(entry);
-  entries.sort((a, b) => b.date.localeCompare(a.date));
+function saveBulk(e) {
+  e.preventDefault();
+  const month = document.getElementById('b_month').value;
+  if (!month) { alert('Please choose a month.'); return; }
+  const date = month + '-01';
 
-  persistEntries();
-  closeModal();
+  let added = 0;
+  funds.forEach(f => {
+    const el  = document.getElementById('b_' + f.id);
+    const amt = parseFloat(el && el.value) || 0;
+    if (amt > 0) { invs.push({ id: uid(), fundId: f.id, date, amount: roundTwo(amt) }); added++; }
+  });
+  if (added === 0) { alert('Enter at least one amount.'); return; }
+
+  persistInvs();
+  closeModal('bulkOverlay');
   render();
 }
 
-// ── Delete entry ───────────────────────────────────────────────────────────
-function deleteEntry(id) {
-  if (!confirm('Delete this entry? This cannot be undone.')) return;
-  entries = entries.filter(e => e.id !== id);
-  persistEntries();
+// ── Delete a single investment ──────────────────────────────────────────────
+function deleteInv(id) {
+  invs = invs.filter(i => i.id !== id);
+  persistInvs();
   render();
 }
 
-// ── Filter ─────────────────────────────────────────────────────────────────
+// ── Filter ──────────────────────────────────────────────────────────────────
 function setFilter(val, btn) {
   activeFilter = val;
   document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
@@ -547,150 +745,166 @@ function setFilter(val, btn) {
   renderTable();
 }
 
-function visibleEntries() {
-  if (activeFilter === 'all') return entries;
-  const ym = todayISO().slice(0, 7);
-  return entries.filter(e => e.date.startsWith(ym));
+function visibleInvs() {
+  const list = [...invs].sort((a, b) => b.date.localeCompare(a.date));
+  if (activeFilter === 'all') return list;
+  const ym = thisMonthISO();
+  return list.filter(i => i.date.startsWith(ym));
 }
 
-// ── Formatters ─────────────────────────────────────────────────────────────
-function fmt(n) {
-  return '\u20B9' + Number(n || 0).toLocaleString('en-IN', {
-    minimumFractionDigits: 0, maximumFractionDigits: 2
-  });
-}
-
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function fmtDate(d) {
-  const [y, m, dd] = d.split('-');
-  return `${+dd} ${MONTHS[+m - 1]} '${y.slice(2)}`;
-}
-
-function fmtMonthLabel(ym) {
-  const [y, m] = ym.split('-');
-  return `${MONTHS[+m - 1]} '${y.slice(2)}`;
-}
-
-function roundTwo(n) { return Math.round(n * 100) / 100; }
-function todayISO()  { return new Date().toISOString().slice(0, 10); }
-
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
-// ── Metric Cards ──────────────────────────────────────────────────────────
+// ── Metric cards ────────────────────────────────────────────────────────────
 function renderMetrics() {
-  const total = entries.reduce((s, e) => s + (e.principal || 0), 0);
-  const grid  = document.getElementById('metricsGrid');
+  const total = grandTotal();
+  const ym = thisMonthISO();
+  const monthTotal = invs.filter(i => i.date.startsWith(ym)).reduce((s, i) => s + (i.amount || 0), 0);
+  const grid = document.getElementById('metricsGrid');
 
-  let html = `
+  grid.innerHTML = `
     <div class="metric-card mc-total">
       <div class="mc-label">Total Invested</div>
       <div class="mc-value">${fmt(total)}</div>
-      <div class="mc-sub">${entries.length} entr${entries.length === 1 ? 'y' : 'ies'}</div>
+      <div class="mc-sub">${invs.length} entr${invs.length === 1 ? 'y' : 'ies'} &middot; ${funds.length} fund${funds.length === 1 ? '' : 's'}</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">This Month</div>
+      <div class="mc-value" style="font-size:1.15rem">${fmt(monthTotal)}</div>
+      <div class="mc-sub">${fmtMonthLabel(ym)}</div>
+    </div>
+    <div class="metric-card">
+      <div class="mc-label">Funds Tracked</div>
+      <div class="mc-value" style="font-size:1.15rem">${funds.length}</div>
+      <div class="mc-sub">${funds.length === 0 ? 'Add your first fund' : 'Use + on a card to invest'}</div>
     </div>`;
-
-  FUNDS.forEach(f => {
-    const fundTotal = entries.reduce((s, e) => s + (e[f.key] || 0), 0);
-    const pct = total > 0 ? (fundTotal / total * 100) : 0;
-    const tgt = f.target * 100;
-    const diff = pct - tgt;
-    const diffStr = diff === 0 ? 'on target'
-      : (diff > 0 ? `+${diff.toFixed(1)}%` : `${diff.toFixed(1)}%`);
-
-    html += `
-      <div class="metric-card">
-        <div class="mc-label">
-          <span class="mc-dot" style="background:${f.color}"></span>${f.label}
-        </div>
-        <div class="mc-value" style="font-size:1.15rem">${fmt(fundTotal)}</div>
-        <div class="mc-sub">${pct.toFixed(1)}% of total &middot; target ${tgt.toFixed(0)}% (${diffStr})</div>
-      </div>`;
-  });
-
-  grid.innerHTML = html;
 }
 
-// ── Table ──────────────────────────────────────────────────────────────────
+// ── Fund cards ──────────────────────────────────────────────────────────────
+function renderFunds() {
+  const area = document.getElementById('fundsArea');
+  document.getElementById('fundsCount').textContent =
+    funds.length ? `${funds.length} fund${funds.length === 1 ? '' : 's'}` : '';
+
+  if (funds.length === 0) {
+    area.innerHTML = `
+      <div class="empty-state">
+        <h3>No funds yet</h3>
+        <p>Add the places you invest in (e.g. Nifty BeES, Motilal Oswal FoF) to start tracking.</p>
+        <button class="btn btn-primary" onclick="openFundModal()">+ Add your first fund</button>
+      </div>`;
+    return;
+  }
+
+  const total = grandTotal();
+
+  area.innerHTML = `<div class="funds-grid">${funds.map(f => {
+    const ft       = fundTotal(f.id);
+    const pct      = total > 0 ? (ft / total * 100) : 0;
+    const tgt      = f.target || 0;
+    const barPct   = Math.min(100, pct);
+    const isOpen   = openHistory.has(f.id);
+    const history  = invs.filter(i => i.fundId === f.id).sort((a, b) => b.date.localeCompare(a.date));
+
+    let meta = `${pct.toFixed(1)}% of total`;
+    if (tgt > 0) {
+      const diff = pct - tgt;
+      const diffStr = Math.abs(diff) < 0.05 ? 'on target'
+        : (diff > 0 ? `+${diff.toFixed(1)}% over` : `${diff.toFixed(1)}% under`);
+      meta += ` &middot; target ${tgt}% (${diffStr})`;
+    }
+
+    return `
+      <div class="fund-card">
+        <div class="fc-top">
+          <div class="fc-name"><span class="fc-dot" style="background:${f.color}"></span>${escHtml(f.name)}</div>
+          <button class="fc-add" title="Add investment" onclick="openQuickAdd('${f.id}')">+</button>
+        </div>
+        <div class="fc-value">${fmt(ft)}</div>
+        ${f.description ? `<div class="fc-desc">${escHtml(f.description)}</div>` : ''}
+        <div class="fc-meta">${meta}</div>
+        <div class="fc-bar"><span style="width:${barPct}%;background:${f.color}"></span></div>
+        <div class="fc-foot">
+          <button class="fc-toggle" onclick="toggleHistory('${f.id}')">${isOpen ? '&#9662; Hide' : '&#9656; History'} (${history.length})</button>
+          <button class="fc-del" onclick="deleteFund('${f.id}')">Delete</button>
+        </div>
+        <div class="fc-history ${isOpen ? 'open' : ''}">
+          ${history.length === 0
+            ? '<div class="fc-empty">No investments yet.</div>'
+            : history.map(i => `
+              <div class="fc-hrow">
+                <span>${fmtDate(i.date)}</span>
+                <span class="h-amt">${fmt(i.amount)}<button class="h-del" title="Delete" onclick="deleteInv('${i.id}')">&#x2715;</button></span>
+              </div>`).join('')}
+        </div>
+      </div>`;
+  }).join('')}</div>`;
+}
+
+function toggleHistory(id) {
+  if (openHistory.has(id)) openHistory.delete(id); else openHistory.add(id);
+  renderFunds();
+}
+
+// ── Investment log table ────────────────────────────────────────────────────
 function renderTable() {
-  const data = visibleEntries();
+  const data = visibleInvs();
   const body = document.getElementById('logBody');
 
   if (data.length === 0) {
-    body.innerHTML = `<tr class="empty-row"><td colspan="10">
+    body.innerHTML = `<tr class="empty-row"><td colspan="4">
       No entries${activeFilter === 'month' ? ' this month' : ' yet'}.
-      Click <strong>+ Log Investment</strong> to get started.
+      Use <strong>Log Investment</strong> or a card's <strong>+</strong> button.
     </td></tr>`;
     return;
   }
 
-  body.innerHTML = data.map(e => `
-    <tr>
-      <td>${fmtDate(e.date)}</td>
-      <td class="td-label">${escHtml(e.label) || '<span style="color:#d1d5db">—</span>'}</td>
-      <td class="td-amount td-total">${fmt(e.principal)}</td>
-      ${FUNDS.map(f => `<td class="td-amount">${fmt(e[f.key])}</td>`).join('')}
-      <td class="td-amount td-total">${fmt(e.kiteTotal)}</td>
-      <td><button class="btn btn-danger" onclick="deleteEntry('${escAttr(e.id)}')">&#x2715;</button></td>
-    </tr>`).join('');
+  body.innerHTML = data.map(i => {
+    const f = fundById(i.fundId);
+    return `
+      <tr>
+        <td>${fmtDate(i.date)}</td>
+        <td><span class="fc-dot" style="display:inline-block;background:${f ? f.color : '#9ca3af'};margin-right:7px"></span>${f ? escHtml(f.name) : '<em>(deleted)</em>'}</td>
+        <td class="td-amount td-total">${fmt(i.amount)}</td>
+        <td><button class="btn btn-danger" onclick="deleteInv('${i.id}')">&#x2715;</button></td>
+      </tr>`;
+  }).join('');
 }
 
-// ── Theme helpers ──────────────────────────────────────────────────────────
-const THEME_KEY = 'dm_pref';
-
-function isDark() {
-  return document.documentElement.getAttribute('data-theme') === 'dark';
-}
+// ── Theme helpers ───────────────────────────────────────────────────────────
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
 
 function applyTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   document.getElementById('themeToggle').textContent = dark ? '\u2600\uFE0F' : '\uD83C\uDF19';
   localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
 }
+function toggleTheme() { applyTheme(!isDark()); render(); }
+function loadTheme()   { applyTheme(localStorage.getItem(THEME_KEY) === 'dark'); }
 
-function toggleTheme() {
-  applyTheme(!isDark());
-  render();
-}
-
-function loadTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  applyTheme(saved === 'dark');
-}
-
-// ── Chart color helpers ────────────────────────────────────────────────────
 function chartColors() {
   const dark = isDark();
   return {
-    tick:         dark ? '#8b949e' : '#6b7280',
-    grid:         dark ? '#21262d' : '#f3f4f6',
-    legend:       dark ? '#8b949e' : '#374151',
-    donutBorder:  dark ? '#161b22' : '#ffffff',
+    tick:        dark ? '#8b949e' : '#6b7280',
+    grid:        dark ? '#21262d' : '#f3f4f6',
+    legend:      dark ? '#8b949e' : '#374151',
+    donutBorder: dark ? '#161b22' : '#ffffff',
   };
 }
 
-// ── Bar Chart ──────────────────────────────────────────────────────────────
+// ── Bar chart: monthly investment by fund (stacked) ─────────────────────────
 function renderBarChart() {
   const ctx = document.getElementById('barChart');
 
-  // Build month buckets in chronological order
   const monthOrder = [];
   const monthMap   = {};
-
-  // Collect all months from entries (oldest → newest)
-  [...entries].reverse().forEach(e => {
-    const ym = e.date.slice(0, 7);
+  [...invs].sort((a, b) => a.date.localeCompare(b.date)).forEach(i => {
+    const ym = i.date.slice(0, 7);
     if (!monthMap[ym]) { monthMap[ym] = {}; monthOrder.push(ym); }
-    FUNDS.forEach(f => {
-      monthMap[ym][f.key] = (monthMap[ym][f.key] || 0) + (e[f.key] || 0);
-    });
+    monthMap[ym][i.fundId] = (monthMap[ym][i.fundId] || 0) + (i.amount || 0);
   });
 
   const labels   = monthOrder.map(fmtMonthLabel);
-  const datasets = FUNDS.map(f => ({
-    label: f.label,
-    data:  monthOrder.map(ym => monthMap[ym][f.key] || 0),
+  const datasets = funds.map(f => ({
+    label: f.name,
+    data:  monthOrder.map(ym => monthMap[ym][f.id] || 0),
     backgroundColor: f.color,
     borderRadius: { topLeft: 3, topRight: 3 },
     borderSkipped: false,
@@ -698,41 +912,26 @@ function renderBarChart() {
 
   if (barChart) barChart.destroy();
 
-  if (labels.length === 0) {
+  if (labels.length === 0 || funds.length === 0) {
     ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
     barChart = null;
     return;
   }
 
   const cc = chartColors();
-
   barChart = new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { boxWidth: 11, padding: 14, font: { size: 11 }, color: cc.legend },
-        },
-        tooltip: {
-          callbacks: {
-            label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y)}`,
-          },
-        },
+        legend: { position: 'bottom', labels: { boxWidth: 11, padding: 14, font: { size: 11 }, color: cc.legend } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y)}` } },
       },
       scales: {
-        x: {
-          stacked: true,
-          grid: { display: false },
-          ticks: { font: { size: 11 }, color: cc.tick },
-        },
+        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 }, color: cc.tick } },
         y: {
-          stacked: true,
-          grid: { color: cc.grid },
-          border: { dash: [4, 4] },
+          stacked: true, grid: { color: cc.grid }, border: { dash: [4, 4] },
           ticks: {
             font: { size: 11 }, color: cc.tick,
             callback: v => v >= 1000 ? '\u20B9' + (v / 1000).toFixed(0) + 'k' : '\u20B9' + v,
@@ -743,43 +942,37 @@ function renderBarChart() {
   });
 }
 
-// ── Donut Chart ────────────────────────────────────────────────────────────
+// ── Donut chart: overall allocation ─────────────────────────────────────────
 function renderDonutChart() {
   const ctx    = document.getElementById('donutChart');
-  const totals = FUNDS.map(f => entries.reduce((s, e) => s + (e[f.key] || 0), 0));
+  const totals = funds.map(f => fundTotal(f.id));
   const grand  = totals.reduce((a, b) => a + b, 0);
 
   if (donutChart) donutChart.destroy();
 
-  if (grand === 0) {
+  if (grand === 0 || funds.length === 0) {
     ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
     donutChart = null;
     return;
   }
 
   const cc = chartColors();
-
   donutChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels:   FUNDS.map(f => f.label),
+      labels:   funds.map(f => f.name),
       datasets: [{
         data:            totals,
-        backgroundColor: FUNDS.map(f => f.color),
+        backgroundColor: funds.map(f => f.color),
         borderWidth:     2,
         borderColor:     cc.donutBorder,
         hoverOffset:     6,
       }],
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '62%',
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { boxWidth: 11, padding: 12, font: { size: 11 }, color: cc.legend },
-        },
+        legend: { position: 'bottom', labels: { boxWidth: 11, padding: 12, font: { size: 11 }, color: cc.legend } },
         tooltip: {
           callbacks: {
             label: c => {
@@ -793,71 +986,40 @@ function renderDonutChart() {
   });
 }
 
-// ── Export CSV ─────────────────────────────────────────────────────────────
+// ── Export CSV ──────────────────────────────────────────────────────────────
 function exportCSV() {
-  if (entries.length === 0) { alert('Nothing to export yet.'); return; }
+  if (invs.length === 0) { alert('Nothing to export yet.'); return; }
 
-  const headers = ['Date', 'Label', 'Principal (INR)',
-    ...FUNDS.map(f => `${f.label} (INR)`), 'Kite Total (INR)'];
-
-  const rows = entries.map(e => [
-    e.date,
-    csvCell(e.label || ''),
-    e.principal,
-    ...FUNDS.map(f => e[f.key] || 0),
-    e.kiteTotal || 0,
-  ]);
+  const headers = ['Date', 'Fund', 'Amount (INR)'];
+  const rows = [...invs].sort((a, b) => b.date.localeCompare(a.date)).map(i => {
+    const f = fundById(i.fundId);
+    return [i.date, csvCell(f ? f.name : '(deleted)'), i.amount || 0];
+  });
 
   const csv  = [headers, ...rows].map(r => r.join(',')).join('\r\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
   const a    = Object.assign(document.createElement('a'), {
-    href:     url,
-    download: `etf-investments-${todayISO()}.csv`,
+    href: url, download: `investments-${todayISO()}.csv`,
   });
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
+function csvCell(s) { return '"' + String(s).replace(/"/g, '""') + '"'; }
 
-function csvCell(s) {
-  return '"' + String(s).replace(/"/g, '""') + '"';
-}
-
-// ── XSS helpers ────────────────────────────────────────────────────────────
-function escHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;')
-                        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) { return escHtml(s); }
-
-// ── Build modal fund fields ────────────────────────────────────────────────
-function buildFundFields() {
-  const container = document.getElementById('fundFields');
-  container.innerHTML = FUNDS.map(f => `
-    <div class="form-group">
-      <label for="f_${f.key}">
-        <span class="fdot" style="background:${f.color}"></span>
-        ${escHtml(f.label)}
-        <span class="tgt">(${(f.target * 100).toFixed(0)}%)</span>
-      </label>
-      <input type="number" id="f_${f.key}" min="0" step="0.01"
-             placeholder="0.00" oninput="recalcKite()" />
-    </div>`).join('');
-}
-
-// ── Master render ──────────────────────────────────────────────────────────
+// ── Master render ───────────────────────────────────────────────────────────
 function render() {
   renderMetrics();
-  renderTable();
+  renderFunds();
   renderBarChart();
   renderDonutChart();
+  renderTable();
 }
 
-// ── Init ───────────────────────────────────────────────────────────────────
-buildFundFields();
-loadEntries();
+// ── Init ────────────────────────────────────────────────────────────────────
+loadAll();
 loadTheme();
 render();
 </script>
